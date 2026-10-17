@@ -46,15 +46,16 @@ npm run icons
 
 ## Deployen auf GitHub Pages
 
-Der Workflow `.github/workflows/deploy.yml` testet, baut und veröffentlicht die App. Er läuft bei jedem Push auf `main` und lässt sich jederzeit von Hand starten.
+Der Workflow `.github/workflows/deploy.yml` testet, baut und veröffentlicht die App **bei jedem Push auf `main`** automatisch. Solange GitHub Pages noch nicht eingerichtet ist, endet er mit einem Hinweis statt mit einem Fehler.
 
-1. **Repo öffentlich machen:** Mit einem Gratis-Konto funktioniert GitHub Pages nur bei öffentlichen Repos (**Settings → General → Danger Zone → Change visibility**).
-2. **Einmalig einrichten:** Im Repo unter **Settings → Pages → Build and deployment → Source** «**GitHub Actions**» wählen.
-3. **Veröffentlichen:** Änderungen auf `main` pushen (oder einen Pull Request nach `main` mergen). Oder von Hand: **Actions → Deploy auf GitHub Pages → Run workflow**.
+Einmalig einrichten, am besten in dieser Reihenfolge:
 
-GitHub Pages veröffentlicht nur vom Standard-Branch des Repos. Wer von Hand startet, wählt darum diesen Branch aus.
+1. **Standard-Branch:** Unter **Settings → General → Default branch** `main` wählen. GitHub Pages veröffentlicht nur vom Standard-Branch.
+2. **Repo öffentlich machen:** Mit einem Gratis-Konto funktioniert GitHub Pages nur bei öffentlichen Repos (**Settings → General → Danger Zone → Change visibility**).
+3. **Pages einschalten:** Unter **Settings → Pages → Build and deployment → Source** «**GitHub Actions**» wählen.
+4. **Ersten Deploy starten:** **Actions → Deploy auf GitHub Pages → Run workflow**. Danach veröffentlicht jeder Push auf `main` von selbst.
 
-Die App ist danach unter `https://<benutzername>.github.io/<repo-name>/` erreichbar. Den Pfad `/<repo-name>/` setzt der Workflow automatisch über die Umgebungsvariable `BASE_PATH`. Ein zweiter Workflow (`test.yml`) prüft Tests und Build bei Pull Requests und auf anderen Branches.
+Die App ist dann unter `https://<benutzername>.github.io/<repo-name>/` erreichbar. Den Pfad `/<repo-name>/` setzt der Workflow automatisch über die Umgebungsvariable `BASE_PATH`. Ein zweiter Workflow (`test.yml`) prüft Tests und Build bei Pull Requests und auf anderen Branches.
 
 ## Auf dem iPhone installieren
 

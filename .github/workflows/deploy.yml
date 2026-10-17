@@ -1,5 +1,6 @@
 name: Deploy auf GitHub Pages
 
+# Jeder Push auf main veröffentlicht die App automatisch. Von Hand: Actions → Run workflow.
 on:
   push:
     branches: [main]
@@ -34,8 +35,34 @@ jobs:
         with:
           path: dist
 
+  # Ist GitHub Pages noch nicht eingerichtet, endet der Lauf mit einem Hinweis statt mit einem Fehler.
+  pages:
+    runs-on: ubuntu-latest
+    outputs:
+      ready: ${{ steps.check.outputs.ready }}
+    steps:
+      - id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if result=$(gh api "repos/${GITHUB_REPOSITORY}/pages" --jq .build_type 2>&1); then
+            if [ "$result" = "workflow" ]; then
+              echo "ready=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "ready=false" >> "$GITHUB_OUTPUT"
+              echo "::warning title=GitHub Pages::Unter Settings → Pages → Source «GitHub Actions» wählen und diesen Workflow erneut starten."
+            fi
+          elif echo "$result" | grep -q "HTTP 404"; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::warning title=GitHub Pages ist noch nicht eingerichtet::Repo öffentlich machen, unter Settings → Pages → Source «GitHub Actions» wählen und diesen Workflow erneut starten."
+          else
+            echo "::error::Status von GitHub Pages nicht lesbar: $result"
+            exit 1
+          fi
+
   deploy:
-    needs: build
+    needs: [build, pages]
+    if: needs.pages.outputs.ready == 'true'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
