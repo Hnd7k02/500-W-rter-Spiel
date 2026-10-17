@@ -6,15 +6,16 @@ Hier liegen alle Vorlagen für die Web-App «500 Wörter».
 
 | Datei / Ordner | Inhalt | Status |
 |---|---|---|
-| `500-woerter-screens.png` | Die drei Screens nebeneinander: Spiel Deutsch, Ausblenden aktiv, Englisch gewonnen | **bitte hochladen** |
+| `500-woerter-screens.png` | Die drei Screens nebeneinander: Spiel Deutsch, Ausblenden aktiv, Englisch gewonnen (aus `quelle/` gerendert) | vorhanden |
 | `500-woerter-bausteine.png` | Alle Bausteine, Zustände und Farbwerte | vorhanden |
-| `screens/` | Optional: weitere Einzel-Screenshots (z. B. `1-spiel.png`, `2-ausblenden.png`, `3-gewonnen.png`, `verloren.png`, `dialog.png`) | optional |
 | `quelle/` | Quelltext der finalen Artboards aus dem Design-Canvas (`*.dc.html`) | vorhanden |
 | `quelle/entwuerfe/` | Frühere Entwürfe, nur zur Info, gelten **nicht** | vorhanden |
+| `inspiration/word500-*.png` | Screenshots vom Original word500.com (Spielprinzip, Markieren, Gewinnzeile) | vorhanden |
+| `inspiration/ui-*.png/jpg` | Allgemeine UI-Inspiration: helle Karten, weiche Schatten, iOS-Widget-Look | vorhanden |
 
 ## Hochladen auf GitHub (iPhone oder Browser)
 
-1. Im Repo auf den Ordner `design` (bzw. `design/screens`) tippen.
+1. Im Repo auf den Ordner `design` tippen.
 2. **Add file → Upload files** wählen.
 3. Bilder auswählen, Dateinamen wie oben verwenden.
 4. Unten «Commit directly to the `claude/500-woerter-webapp-lqq8nn` branch» wählen und **Commit changes**.
