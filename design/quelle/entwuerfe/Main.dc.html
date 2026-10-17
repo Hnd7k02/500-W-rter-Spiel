@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Füfer – Klar</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#15171C}a:hover{color:#000000}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; padding: 20px 16px 24px; display: flex; flex-direction: column; background: #FFFFFF; color: #15171C; font-family: 'Plus Jakarta Sans', system-ui, sans-serif">
+<header style="height: 48px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between">
+<div style="display: flex; align-items: center; gap: 10px">
+<div aria-hidden="true" style="width: 30px; height: 30px; border-radius: 9px; background: #15171C; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 800">5</div>
+<span style="font-size: 22px; font-weight: 800; letter-spacing: -0.02em">Füfer</span>
+</div>
+<div style="display: flex; align-items: center; gap: 8px">
+<button type="button" aria-label="Spielregeln" style="width: 44px; height: 44px; padding: 0; border: 1px solid #E2E5E9; border-radius: 22px; background: #FFFFFF; color: #15171C; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M9.5 9.4a2.6 2.6 0 0 1 5 .9c0 1.7-2.5 2.2-2.5 3.7"></path><path d="M12 17.3h.01"></path></svg></button>
+<button type="button" aria-label="Neues Wort würfeln" style="width: 44px; height: 44px; padding: 0; border: 0; border-radius: 22px; background: #15171C; color: #FFFFFF; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"></rect><circle cx="8.6" cy="8.6" r="1.3" fill="currentColor" stroke="none"></circle><circle cx="15.4" cy="8.6" r="1.3" fill="currentColor" stroke="none"></circle><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"></circle><circle cx="8.6" cy="15.4" r="1.3" fill="currentColor" stroke="none"></circle><circle cx="15.4" cy="15.4" r="1.3" fill="currentColor" stroke="none"></circle></svg></button>
+</div>
+</header>
+<main style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<sc-for list="{{done}}" as="row" hint-placeholder-count="4">
+<div style="display: flex; align-items: center; gap: 12px">
+<div style="display: flex; gap: 6px">
+<sc-for list="{{row.cells}}" as="cell" hint-placeholder-count="5">
+<button type="button" aria-label="{{cell.label}}" style="width: 44px; height: 44px; box-sizing: border-box; padding: 0; border: 0; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 23px; font-weight: 800; cursor: pointer; background: {{cell.bg}}; color: {{cell.fg}}">{{cell.ch}}</button>
+</sc-for>
+</div>
+<div style="display: flex; gap: 6px">
+<sc-for list="{{row.score}}" as="sc" hint-placeholder-count="3">
+<div style="width: 30px; height: 30px; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; background: {{sc.bg}}; color: {{sc.fg}}">{{sc.n}}</div>
+</sc-for>
+</div>
+</div>
+</sc-for>
+<div style="display: flex; align-items: center; gap: 12px">
+<div style="display: flex; gap: 6px">
+<sc-for list="{{active}}" as="cell" hint-placeholder-count="5">
+<div style="width: 44px; height: 44px; box-sizing: border-box; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 23px; font-weight: 800; background: #FFFFFF; color: #15171C; border: 2px solid {{cell.bd}}">{{cell.ch}}</div>
+</sc-for>
+</div>
+<div style="display: flex; gap: 6px">
+<div style="width: 30px; height: 30px; border-radius: 15px; background: #F4F5F7"></div>
+<div style="width: 30px; height: 30px; border-radius: 15px; background: #F4F5F7"></div>
+<div style="width: 30px; height: 30px; border-radius: 15px; background: #F4F5F7"></div>
+</div>
+</div>
+<sc-for list="{{empty}}" as="e" hint-placeholder-count="3">
+<div style="display: flex; align-items: center; gap: 12px">
+<div style="display: flex; gap: 6px">
+<div style="width: 44px; height: 44px; border-radius: 10px; background: #F1F2F4"></div>
+<div style="width: 44px; height: 44px; border-radius: 10px; background: #F1F2F4"></div>
+<div style="width: 44px; height: 44px; border-radius: 10px; background: #F1F2F4"></div>
+<div style="width: 44px; height: 44px; border-radius: 10px; background: #F1F2F4"></div>
+<div style="width: 44px; height: 44px; border-radius: 10px; background: #F1F2F4"></div>
+</div>
+<div style="display: flex; gap: 6px">
+<div style="width: 30px; height: 30px; border-radius: 15px; background: #F4F5F7"></div>
+<div style="width: 30px; height: 30px; border-radius: 15px; background: #F4F5F7"></div>
+<div style="width: 30px; height: 30px; border-radius: 15px; background: #F4F5F7"></div>
+</div>
+</div>
+</sc-for>
+</div>
+<div style="display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 600; color: #646A75">
+<span>Antippen:</span>
+<span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 3px; background: {{c.x}}"></span>Falsch</span>
+<span aria-hidden="true" style="color: #B3B8C0">›</span>
+<span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 3px; background: {{c.v}}"></span>Vielleicht</span>
+<span aria-hidden="true" style="color: #B3B8C0">›</span>
+<span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 3px; background: {{c.r}}"></span>Richtig</span>
+</div>
+</main>
+<nav aria-label="Tastatur" style="flex-shrink: 0; display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; gap: 6px">
+<sc-for list="{{k1}}" as="k" hint-placeholder-count="10">
+<button type="button" aria-label="{{k.label}}" style="flex: 1; min-width: 0; height: 52px; padding: 0; border: 0; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; background: {{k.bg}}; color: {{k.fg}}">{{k.ch}}</button>
+</sc-for>
+</div>
+<div style="display: flex; gap: 6px; padding: 0 18px">
+<sc-for list="{{k2}}" as="k" hint-placeholder-count="9">
+<button type="button" aria-label="{{k.label}}" style="flex: 1; min-width: 0; height: 52px; padding: 0; border: 0; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; background: {{k.bg}}; color: {{k.fg}}">{{k.ch}}</button>
+</sc-for>
+</div>
+<div style="display: flex; gap: 6px">
+<button type="button" aria-label="Wort prüfen" style="flex: 1.6; min-width: 0; height: 52px; padding: 0; border: 0; border-radius: 8px; background: #15171C; color: #FFFFFF; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 5v6.5a3 3 0 0 1-3 3H6"></path><path d="M10 10.5l-4 4 4 4"></path></svg></button>
+<sc-for list="{{k3}}" as="k" hint-placeholder-count="7">
+<button type="button" aria-label="{{k.label}}" style="flex: 1; min-width: 0; height: 52px; padding: 0; border: 0; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; background: {{k.bg}}; color: {{k.fg}}">{{k.ch}}</button>
+</sc-for>
+<button type="button" aria-label="Buchstabe löschen" style="flex: 1.6; min-width: 0; height: 52px; padding: 0; border: 0; border-radius: 8px; background: #ECEEF1; color: #15171C; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5h10.5A1.5 1.5 0 0 1 21 6.5v11a1.5 1.5 0 0 1-1.5 1.5H9l-6-7z"></path><path d="M12.5 9.5l5 5M17.5 9.5l-5 5"></path></svg></button>
+</div>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"richtig":{"editor":"color","default":"#23864C","options":["#23864C","#2F9E61","#1E7A8C","#2F6FE4"],"section":"Farbstufen"},"vielleicht":{"editor":"color","default":"#F2C14E","options":["#F2C14E","#F5A524","#E8D44D","#FF9F43"],"section":"Farbstufen"},"falsch":{"editor":"color","default":"#D0453A","options":["#D0453A","#E5484D","#B4483F","#8A919C"],"section":"Farbstufen"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  hexRgb(value) {
+    const s = String(value || '').trim();
+    if (/^rgb/i.test(s)) {
+      const p = s.match(/[\d.]+/g) || [];
+      return [Number(p[0]) || 0, Number(p[1]) || 0, Number(p[2]) || 0];
+    }
+    let h = s.replace('#', '');
+    if (h.length === 3 || h.length === 4) {
+      h = h.slice(0, 3).split('').map((ch) => ch + ch).join('');
+    }
+    const n = parseInt(h.slice(0, 6), 16);
+    if (isNaN(n)) return [0, 0, 0];
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  }
+
+  tint(value, alpha) {
+    const c = this.hexRgb(value);
+    return 'rgba(' + c[0] + ', ' + c[1] + ', ' + c[2] + ', ' + alpha + ')';
+  }
+
+  blend(value, other, t) {
+    const a = this.hexRgb(value);
+    const b = this.hexRgb(other);
+    const m = [0, 1, 2].map((i) => Math.round(a[i] + (b[i] - a[i]) * t));
+    return 'rgb(' + m[0] + ', ' + m[1] + ', ' + m[2] + ')';
+  }
+
+  luma(value) {
+    const c = this.hexRgb(value).map((v) => {
+      const s = v / 255;
+      return s <= 0.04045 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+    });
+    return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+  }
+
+  inkOn(value, dark, light) {
+    return this.luma(value) > 0.2 ? dark : light;
+  }
+
+  renderVals() {
+    // Drei Farbstufen: Falsch (leise) < Vielleicht < Richtig (laut)
+    const c = {
+      r: this.props.richtig ?? '#23864C',
+      v: this.props.vielleicht ?? '#F2C14E',
+      x: this.props.falsch ?? '#D0453A'
+    };
+    const look = {
+      r: { bg: c.r, fg: this.inkOn(c.r, '#0B2414', '#FFFFFF') },
+      v: { bg: c.v, fg: this.inkOn(c.v, '#2B2100', '#FFFFFF') },
+      x: { bg: this.tint(c.x, 0.13), fg: this.blend(c.x, '#000000', 0.2) },
+      n: { bg: '#ECEEF1', fg: '#15171C' }
+    };
+    const keyLook = {
+      r: look.r,
+      v: look.v,
+      x: { bg: this.tint(c.x, 0.1), fg: this.blend(c.x, '#000000', 0.2) },
+      n: { bg: '#ECEEF1', fg: '#15171C' }
+    };
+    const name = { r: 'richtig', v: 'vielleicht', x: 'falsch', n: 'nicht markiert' };
+
+    // Beispielpartie: Lösung BRAVE, vier Versuche, Zeile 5 wird getippt.
+    // m = eigene Markierung pro Buchstabe (x falsch, v vielleicht, r richtig)
+    // s = Wertung des Spiels [richtig, vielleicht, falsch]
+    const guesses = [
+      { w: 'STONE', m: 'xxxxv', s: [1, 0, 4] },
+      { w: 'CLAIM', m: 'xxrxx', s: [1, 0, 4] },
+      { w: 'GRAPH', m: 'xrrxx', s: [2, 0, 3] },
+      { w: 'BREAD', m: 'rrvvx', s: [2, 2, 1] }
+    ];
+    const input = 'BRA';
+
+    const done = guesses.map((g) => ({
+      cells: g.w.split('').map((ch, i) => {
+        const m = look[g.m[i]] ? g.m[i] : 'n';
+        return { ch: ch, bg: look[m].bg, fg: look[m].fg, label: ch + ', ' + name[m] };
+      }),
+      score: ['r', 'v', 'x'].map((k, i) => {
+        const count = g.s[i];
+        const st = count > 0 ? look[k] : { bg: '#F3F4F6', fg: '#6F7581' };
+        return { n: String(count), bg: st.bg, fg: st.fg };
+      })
+    }));
+
+    const active = [0, 1, 2, 3, 4].map((i) => ({
+      ch: input.charAt(i),
+      bd: i < input.length ? '#15171C' : (i === input.length ? '#9AA1AB' : '#E1E4E8')
+    }));
+
+    // Taste = stärkste Markierung des Buchstabens (Richtig > Vielleicht > Falsch)
+    const rank = { x: 1, v: 2, r: 3 };
+    const best = {};
+    guesses.forEach((g) => {
+      g.w.split('').forEach((ch, i) => {
+        const m = g.m[i];
+        if (rank[m] && (!best[ch] || rank[m] > rank[best[ch]])) best[ch] = m;
+      });
+    });
+    const keys = (row) => row.split('').map((ch) => {
+      const m = best[ch] || 'n';
+      return {
+        ch: ch,
+        bg: keyLook[m].bg,
+        fg: keyLook[m].fg,
+        label: m === 'n' ? ch : ch + ', ' + name[m]
+      };
+    });
+
+    return {
+      c: c,
+      done: done,
+      active: active,
+      empty: [{ id: 6 }, { id: 7 }, { id: 8 }],
+      k1: keys('QWERTYUIOP'),
+      k2: keys('ASDFGHJKL'),
+      k3: keys('ZXCVBNM')
+    };
+  }
+}
+</script>
+</body>
+</html>

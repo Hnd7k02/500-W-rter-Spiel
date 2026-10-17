@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Füfer – Marker</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#111111}a:hover{color:#000000}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; padding: 20px 16px 24px; display: flex; flex-direction: column; background: #FFFFFF; color: #111111; font-family: 'Bricolage Grotesque', system-ui, sans-serif">
+<header style="height: 48px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between">
+<div style="position: relative; display: flex; align-items: center; height: 40px; padding: 0 2px">
+<span aria-hidden="true" style="position: absolute; left: -3px; right: -5px; bottom: 7px; height: 13px; border-radius: 3px 9px 4px 10px; transform: rotate(-1.5deg); background: {{hl.v}}"></span>
+<span style="position: relative; font-size: 28px; font-weight: 800; letter-spacing: -0.03em">Füfer</span>
+</div>
+<div style="display: flex; align-items: center; gap: 8px">
+<button type="button" aria-label="Spielregeln" style="width: 44px; height: 44px; box-sizing: border-box; padding: 0; border: 2px solid #111111; border-radius: 22px; background: #FFFFFF; color: #111111; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M9.5 9.4a2.6 2.6 0 0 1 5 .9c0 1.7-2.5 2.2-2.5 3.7"></path><path d="M12 17.3h.01"></path></svg></button>
+<button type="button" aria-label="Neues Wort würfeln" style="width: 44px; height: 44px; box-sizing: border-box; padding: 0; border: 2px solid #111111; border-radius: 22px; background: #111111; color: #FFFFFF; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"></rect><circle cx="8.6" cy="8.6" r="1.3" fill="currentColor" stroke="none"></circle><circle cx="15.4" cy="8.6" r="1.3" fill="currentColor" stroke="none"></circle><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"></circle><circle cx="8.6" cy="15.4" r="1.3" fill="currentColor" stroke="none"></circle><circle cx="15.4" cy="15.4" r="1.3" fill="currentColor" stroke="none"></circle></svg></button>
+</div>
+</header>
+<main style="flex: 1; display: flex; align-items: center; justify-content: center">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<sc-for list="{{done}}" as="row" hint-placeholder-count="4">
+<div style="display: flex; align-items: center; gap: 12px">
+<div style="display: flex; gap: 6px">
+<sc-for list="{{row.cells}}" as="cell" hint-placeholder-count="5">
+<button type="button" aria-label="{{cell.label}}" style="position: relative; width: 46px; height: 48px; box-sizing: border-box; padding: 0; border: 0; border-bottom: 2px solid #DAD9D4; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer"><span aria-hidden="true" style="position: absolute; left: 2px; right: 2px; top: 8px; bottom: 6px; border-radius: 6px 12px 7px 13px / 12px 6px 13px 7px; transform: rotate({{cell.rot}}); background: {{cell.hl}}"></span><span style="position: relative; font-size: 30px; font-weight: 800; line-height: 1; color: {{cell.fg}}">{{cell.ch}}</span><span aria-hidden="true" style="position: absolute; left: 8px; right: 8px; top: 50%; height: 3px; margin-top: -2px; border-radius: 2px; transform: rotate(-14deg); background: {{cell.sc}}; opacity: {{cell.strike}}"></span></button>
+</sc-for>
+</div>
+<div style="display: flex; gap: 4px">
+<sc-for list="{{row.score}}" as="sc" hint-placeholder-count="3">
+<div style="position: relative; width: 28px; height: 36px; display: flex; align-items: center; justify-content: center"><span aria-hidden="true" style="position: absolute; left: 1px; right: 1px; top: 5px; bottom: 5px; border-radius: 5px 10px 6px 11px / 10px 5px 11px 6px; transform: rotate({{sc.rot}}); background: {{sc.hl}}"></span><span style="position: relative; font-size: 19px; font-weight: 800; color: {{sc.fg}}">{{sc.n}}</span></div>
+</sc-for>
+</div>
+</div>
+</sc-for>
+<div style="display: flex; align-items: center; gap: 12px">
+<div style="display: flex; gap: 6px">
+<sc-for list="{{active}}" as="cell" hint-placeholder-count="5">
+<div style="position: relative; width: 46px; height: 48px; box-sizing: border-box; border-bottom: 2px solid {{cell.rule}}; display: flex; align-items: center; justify-content: center"><span style="font-size: 30px; font-weight: 800; line-height: 1">{{cell.ch}}</span><span aria-hidden="true" style="position: absolute; left: 50%; top: 11px; width: 2px; height: 26px; margin-left: -1px; background: #111111; opacity: {{cell.caret}}"></span></div>
+</sc-for>
+</div>
+<div style="width: 92px; height: 36px"></div>
+</div>
+<sc-for list="{{empty}}" as="e" hint-placeholder-count="3">
+<div style="display: flex; align-items: center; gap: 12px">
+<div style="display: flex; gap: 6px">
+<div style="width: 46px; height: 48px; box-sizing: border-box; border-bottom: 2px solid #EBEAE6"></div>
+<div style="width: 46px; height: 48px; box-sizing: border-box; border-bottom: 2px solid #EBEAE6"></div>
+<div style="width: 46px; height: 48px; box-sizing: border-box; border-bottom: 2px solid #EBEAE6"></div>
+<div style="width: 46px; height: 48px; box-sizing: border-box; border-bottom: 2px solid #EBEAE6"></div>
+<div style="width: 46px; height: 48px; box-sizing: border-box; border-bottom: 2px solid #EBEAE6"></div>
+</div>
+<div style="width: 92px; height: 36px"></div>
+</div>
+</sc-for>
+</div>
+</main>
+<nav aria-label="Tastatur" style="flex-shrink: 0; display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; gap: 6px">
+<sc-for list="{{k1}}" as="k" hint-placeholder-count="10">
+<button type="button" aria-label="{{k.label}}" style="flex: 1; min-width: 0; height: 52px; padding: 0; border: 0; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 800; cursor: pointer; background: {{k.bg}}; color: {{k.fg}}"><span style="position: relative">{{k.ch}}<span aria-hidden="true" style="position: absolute; left: -5px; right: -5px; top: 50%; height: 2px; margin-top: -1px; border-radius: 1px; transform: rotate(-14deg); background: {{k.sc}}; opacity: {{k.strike}}"></span></span></button>
+</sc-for>
+</div>
+<div style="display: flex; gap: 6px; padding: 0 18px">
+<sc-for list="{{k2}}" as="k" hint-placeholder-count="9">
+<button type="button" aria-label="{{k.label}}" style="flex: 1; min-width: 0; height: 52px; padding: 0; border: 0; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 800; cursor: pointer; background: {{k.bg}}; color: {{k.fg}}"><span style="position: relative">{{k.ch}}<span aria-hidden="true" style="position: absolute; left: -5px; right: -5px; top: 50%; height: 2px; margin-top: -1px; border-radius: 1px; transform: rotate(-14deg); background: {{k.sc}}; opacity: {{k.strike}}"></span></span></button>
+</sc-for>
+</div>
+<div style="display: flex; gap: 6px">
+<button type="button" aria-label="Wort prüfen" style="flex: 1.6; min-width: 0; height: 52px; padding: 0; border: 0; border-radius: 8px; background: #111111; color: #FFFFFF; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 5v6.5a3 3 0 0 1-3 3H6"></path><path d="M10 10.5l-4 4 4 4"></path></svg></button>
+<sc-for list="{{k3}}" as="k" hint-placeholder-count="7">
+<button type="button" aria-label="{{k.label}}" style="flex: 1; min-width: 0; height: 52px; padding: 0; border: 0; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 800; cursor: pointer; background: {{k.bg}}; color: {{k.fg}}"><span style="position: relative">{{k.ch}}<span aria-hidden="true" style="position: absolute; left: -5px; right: -5px; top: 50%; height: 2px; margin-top: -1px; border-radius: 1px; transform: rotate(-14deg); background: {{k.sc}}; opacity: {{k.strike}}"></span></span></button>
+</sc-for>
+<button type="button" aria-label="Buchstabe löschen" style="flex: 1.6; min-width: 0; height: 52px; padding: 0; border: 0; border-radius: 8px; background: #F1F1EE; color: #111111; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5h10.5A1.5 1.5 0 0 1 21 6.5v11a1.5 1.5 0 0 1-1.5 1.5H9l-6-7z"></path><path d="M12.5 9.5l5 5M17.5 9.5l-5 5"></path></svg></button>
+</div>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"richtig":{"editor":"color","default":"#2FCB76","options":["#2FCB76","#5BD98F","#38C6D9","#7AA7FF"],"section":"Farbstufen"},"vielleicht":{"editor":"color","default":"#FFD23F","options":["#FFD23F","#FFE45C","#FFB547","#FF9EC4"],"section":"Farbstufen"},"falsch":{"editor":"color","default":"#EF4A3C","options":["#EF4A3C","#E0245E","#D9480F","#111111"],"section":"Farbstufen"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  hexRgb(value) {
+    const s = String(value || '').trim();
+    if (/^rgb/i.test(s)) {
+      const p = s.match(/[\d.]+/g) || [];
+      return [Number(p[0]) || 0, Number(p[1]) || 0, Number(p[2]) || 0];
+    }
+    let h = s.replace('#', '');
+    if (h.length === 3 || h.length === 4) {
+      h = h.slice(0, 3).split('').map((ch) => ch + ch).join('');
+    }
+    const n = parseInt(h.slice(0, 6), 16);
+    if (isNaN(n)) return [0, 0, 0];
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  }
+
+  tint(value, alpha) {
+    const c = this.hexRgb(value);
+    return 'rgba(' + c[0] + ', ' + c[1] + ', ' + c[2] + ', ' + alpha + ')';
+  }
+
+  renderVals() {
+    // Wie auf Papier: Richtig/Vielleicht mit Leuchtstift, Falsch durchgestrichen
+    const c = {
+      r: this.props.richtig ?? '#2FCB76',
+      v: this.props.vielleicht ?? '#FFD23F',
+      x: this.props.falsch ?? '#EF4A3C'
+    };
+    const hl = { r: this.tint(c.r, 0.5), v: this.tint(c.v, 0.72), x: this.tint(c.x, 0.24) };
+    const tilt = ['-2deg', '1.5deg', '-1deg', '2deg', '-1.5deg', '1deg'];
+    const look = {
+      r: { hl: hl.r, fg: '#111111', strike: 0 },
+      v: { hl: hl.v, fg: '#111111', strike: 0 },
+      x: { hl: 'transparent', fg: '#8C8A83', strike: 1 },
+      n: { hl: 'transparent', fg: '#111111', strike: 0 }
+    };
+    const keyLook = {
+      r: { bg: this.tint(c.r, 0.6), fg: '#111111', strike: 0 },
+      v: { bg: this.tint(c.v, 0.8), fg: '#111111', strike: 0 },
+      x: { bg: '#F8F8F6', fg: '#6E6C66', strike: 1 },
+      n: { bg: '#F1F1EE', fg: '#111111', strike: 0 }
+    };
+    const name = { r: 'richtig', v: 'vielleicht', x: 'falsch', n: 'nicht markiert' };
+
+    // Beispielpartie: Lösung BRAVE, vier Versuche, Zeile 5 wird getippt
+    const guesses = [
+      { w: 'STONE', m: 'xxxxv', s: [1, 0, 4] },
+      { w: 'CLAIM', m: 'xxrxx', s: [1, 0, 4] },
+      { w: 'GRAPH', m: 'xrrxx', s: [2, 0, 3] },
+      { w: 'BREAD', m: 'rrvvx', s: [2, 2, 1] }
+    ];
+    const input = 'BRA';
+
+    const done = guesses.map((g, r) => ({
+      cells: g.w.split('').map((ch, i) => {
+        const m = look[g.m[i]] ? g.m[i] : 'n';
+        return {
+          ch: ch,
+          hl: look[m].hl,
+          fg: look[m].fg,
+          strike: look[m].strike,
+          sc: c.x,
+          rot: tilt[(r * 2 + i) % tilt.length],
+          label: ch + ', ' + name[m]
+        };
+      }),
+      score: ['r', 'v', 'x'].map((k, i) => {
+        const count = g.s[i];
+        if (count > 0) {
+          return { n: String(count), hl: hl[k], fg: '#111111', rot: tilt[(r + i + 3) % tilt.length] };
+        }
+        return { n: '0', hl: 'transparent', fg: '#8C8A83', rot: '0deg' };
+      })
+    }));
+
+    const active = [0, 1, 2, 3, 4].map((i) => ({
+      ch: input.charAt(i),
+      rule: i <= input.length ? '#111111' : '#DAD9D4',
+      caret: i === input.length ? 1 : 0
+    }));
+
+    const rank = { x: 1, v: 2, r: 3 };
+    const best = {};
+    guesses.forEach((g) => {
+      g.w.split('').forEach((ch, i) => {
+        const m = g.m[i];
+        if (rank[m] && (!best[ch] || rank[m] > rank[best[ch]])) best[ch] = m;
+      });
+    });
+    const keys = (row) => row.split('').map((ch) => {
+      const m = best[ch] || 'n';
+      return {
+        ch: ch,
+        bg: keyLook[m].bg,
+        fg: keyLook[m].fg,
+        strike: keyLook[m].strike,
+        sc: c.x,
+        label: m === 'n' ? ch : ch + ', ' + name[m]
+      };
+    });
+
+    return {
+      hl: hl,
+      done: done,
+      active: active,
+      empty: [{ id: 6 }, { id: 7 }, { id: 8 }],
+      k1: keys('QWERTYUIOP'),
+      k2: keys('ASDFGHJKL'),
+      k3: keys('ZXCVBNM')
+    };
+  }
+}
+</script>
+</body>
+</html>

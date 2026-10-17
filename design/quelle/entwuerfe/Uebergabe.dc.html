@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Übergabe für Claude Code</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#15171C}a:hover{color:#000000}
+</style>
+</helmet>
+<div style="width: 1440px; height: 1400px; box-sizing: border-box; padding: 72px; display: flex; flex-direction: column; gap: 52px; background: #FFFFFF; color: #15171C; font-family: 'Plus Jakarta Sans', system-ui, sans-serif">
+<header style="max-width: 940px; display: flex; flex-direction: column; gap: 14px">
+<div style="font-size: 13px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #5D6370">Übergabe für Claude Code</div>
+<h1 style="margin: 0; font-size: 44px; line-height: 1.12; font-weight: 800; letter-spacing: -0.02em">Ein Spiel, fünf Looks – Logik und Farben für den Nachbau</h1>
+<p style="margin: 0; font-size: 18px; line-height: 1.55; color: #4F5562">Logik, Ablauf und Datenmodell sind in allen fünf Varianten gleich; nur das Erscheinungsbild unterscheidet sich. «Füfer» ist ein Arbeitstitel.</p>
+</header>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 56px; align-items: start">
+<section style="display: flex; flex-direction: column; gap: 20px">
+<h2 style="margin: 0; font-size: 21px; font-weight: 800; letter-spacing: -0.01em">1 · Spielprinzip</h2>
+<ol style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 12px; font-size: 15px; line-height: 1.55">
+<li style="padding-left: 4px">Gesucht ist ein Wort mit 5 Buchstaben. Du hast 8 Versuche.</li>
+<li style="padding-left: 4px">Nach jedem Versuch zeigt das Spiel nur drei Zahlen: <strong>Richtig</strong> (Buchstabe an der richtigen Stelle), <strong>Vielleicht</strong> (im Wort, aber an anderer Stelle) und <strong>Falsch</strong> (nicht im Wort). Zusammen ergeben sie immer 5.</li>
+<li style="padding-left: 4px">Welche Buchstaben gemeint sind, verrät das Spiel nie – das findest du selbst heraus.</li>
+<li style="padding-left: 4px">Doppelte Buchstaben zählen wie bei Wordle: zuerst die exakten Treffer, danach pro Buchstabe höchstens so oft «Vielleicht», wie er im Lösungswort noch übrig ist.</li>
+<li style="padding-left: 4px">Nur Wörter aus der Wortliste zählen als Versuch, sonst wackelt die Zeile kurz. Das Mockup nutzt englische Wörter wie das Original.</li>
+</ol>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<h3 style="margin: 0; font-size: 15px; font-weight: 700">Bewertung</h3>
+<div style="border-radius: 12px; background: #F4F5F7; padding: 14px 18px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; line-height: 1.6; color: #2A2E36">
+<div style="white-space: pre">R = gleiche Stelle, gleicher Buchstabe</div>
+<div style="white-space: pre">V = Σ min(Rest im Versuch, Rest im Ziel)</div>
+<div style="white-space: pre">F = 5 − R − V</div>
+</div>
+<p style="margin: 0; font-size: 14px; line-height: 1.55; color: #4F5562">Im Mockup: Lösung BRAVE – der Versuch BREAD ergibt 2 · 2 · 1.</p>
+</div>
+</section>
+<section style="display: flex; flex-direction: column; gap: 20px">
+<h2 style="margin: 0; font-size: 21px; font-weight: 800; letter-spacing: -0.01em">2 · Interaktion</h2>
+<div style="display: flex; flex-direction: column; gap: 12px">
+<h3 style="margin: 0; font-size: 15px; font-weight: 700">Markieren in drei Farbstufen</h3>
+<div style="display: flex; align-items: flex-start; gap: 8px">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 6px">
+<div style="width: 44px; height: 44px; border-radius: 10px; background: #ECEEF1; color: #15171C; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 800">E</div>
+<span style="font-size: 12px; font-weight: 600; color: #5D6370">leer</span>
+</div>
+<span aria-hidden="true" style="height: 44px; display: flex; align-items: center; font-size: 16px; color: #A3A9B2">→</span>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 6px">
+<div style="width: 44px; height: 44px; border-radius: 10px; background: #F9E7E5; color: #A6372E; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 800">E</div>
+<span style="font-size: 12px; font-weight: 600; color: #5D6370">Falsch</span>
+</div>
+<span aria-hidden="true" style="height: 44px; display: flex; align-items: center; font-size: 16px; color: #A3A9B2">→</span>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 6px">
+<div style="width: 44px; height: 44px; border-radius: 10px; background: #F2C14E; color: #2B2100; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 800">E</div>
+<span style="font-size: 12px; font-weight: 600; color: #5D6370">Vielleicht</span>
+</div>
+<span aria-hidden="true" style="height: 44px; display: flex; align-items: center; font-size: 16px; color: #A3A9B2">→</span>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 6px">
+<div style="width: 44px; height: 44px; border-radius: 10px; background: #23864C; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 800">E</div>
+<span style="font-size: 12px; font-weight: 600; color: #5D6370">Richtig</span>
+</div>
+<span aria-hidden="true" style="height: 44px; display: flex; align-items: center; color: #A3A9B2"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"></path><path d="M3 4v5h5"></path></svg></span>
+</div>
+<p style="margin: 0; font-size: 15px; line-height: 1.55">Buchstaben einer geratenen Zeile antippen: leer → Falsch → Vielleicht → Richtig → wieder leer. Die Markierung ist nur deine Notiz und ändert die Wertung nie. Falsch ist bewusst die leiseste Stufe, Richtig die lauteste.</p>
+</div>
+<ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 10px; font-size: 15px; line-height: 1.55">
+<li style="padding-left: 4px"><strong>Tastatur:</strong> Jede Taste übernimmt die stärkste Markierung ihres Buchstabens (Richtig vor Vielleicht vor Falsch).</li>
+<li style="padding-left: 4px"><strong>Würfel:</strong> neues Zufallswort. Läuft eine Partie, kurz nachfragen: «Aktuelles Wort aufgeben?»</li>
+<li style="padding-left: 4px"><strong>Gewonnen</strong> bei 5 · 0 · 0: kurze Meldung, danach den Würfel hervorheben.</li>
+<li style="padding-left: 4px"><strong>Verloren</strong> nach 8 Versuchen: Lösung zeigen.</li>
+<li style="padding-left: 4px"><strong>Bewusst weggelassen:</strong> Datum, Archiv, Tipp-Knopf, Radierer. Regeln und Statistik liegen hinter «?».</li>
+<li style="padding-left: 4px">Laufende Partie samt Markierungen lokal speichern, damit nichts verloren geht.</li>
+</ul>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<h3 style="margin: 0; font-size: 15px; font-weight: 700">Datenmodell</h3>
+<div style="border-radius: 12px; background: #F4F5F7; padding: 14px 18px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; line-height: 1.6; color: #2A2E36">
+<div style="white-space: pre">spiel = {</div>
+<div style="white-space: pre">  loesung: "BRAVE",</div>
+<div style="white-space: pre">  versuche: [{</div>
+<div style="white-space: pre">    wort: "BREAD",</div>
+<div style="white-space: pre">    wertung: [2, 2, 1],</div>
+<div style="white-space: pre">    markierung: ["r","r","v","v","x"]</div>
+<div style="white-space: pre">  }],</div>
+<div style="white-space: pre">  eingabe: "BRA"</div>
+<div style="white-space: pre">}</div>
+</div>
+</div>
+</section>
+<section style="display: flex; flex-direction: column; gap: 20px">
+<h2 style="margin: 0; font-size: 21px; font-weight: 800; letter-spacing: -0.01em">3 · Varianten und Farben</h2>
+<div style="display: flex; flex-direction: column">
+<div style="display: flex; flex-direction: column; gap: 6px; padding: 14px 0; border-bottom: 1px solid #ECEEF1">
+<div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px"><span style="font-size: 15px; font-weight: 700">1 · Klar</span><span style="font-size: 13px; color: #5D6370">Plus Jakarta Sans · hell</span></div>
+<div style="font-size: 14px; line-height: 1.5; color: #4F5562">Zahlen in Kreisen, Falsch als zarte Tönung, kurze Legende.</div>
+<div style="display: flex; align-items: center; gap: 6px; margin-top: 2px"><span style="width: 20px; height: 20px; border-radius: 6px; background: #FFFFFF; box-shadow: inset 0 0 0 1px #D5D8DE"></span><span style="width: 20px; height: 20px; border-radius: 6px; background: #23864C"></span><span style="width: 20px; height: 20px; border-radius: 6px; background: #F2C14E"></span><span style="width: 20px; height: 20px; border-radius: 6px; background: #D0453A"></span><span style="margin-left: 8px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: #4F5562">23864C · F2C14E · D0453A</span></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px; padding: 14px 0; border-bottom: 1px solid #ECEEF1">
+<div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px"><span style="font-size: 15px; font-weight: 700">2 · Nacht</span><span style="font-size: 13px; color: #5D6370">Space Grotesk · dunkel</span></div>
+<div style="font-size: 14px; line-height: 1.5; color: #4F5562">Aufbau wie das Original, aufgeräumt; Nullen treten zurück.</div>
+<div style="display: flex; align-items: center; gap: 6px; margin-top: 2px"><span style="width: 20px; height: 20px; border-radius: 6px; background: #0F1114"></span><span style="width: 20px; height: 20px; border-radius: 6px; background: #3DB46D"></span><span style="width: 20px; height: 20px; border-radius: 6px; background: #E9BE45"></span><span style="width: 20px; height: 20px; border-radius: 6px; background: #E5534B"></span><span style="margin-left: 8px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: #4F5562">3DB46D · E9BE45 · E5534B</span></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px; padding: 14px 0; border-bottom: 1px solid #ECEEF1">
+<div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px"><span style="font-size: 15px; font-weight: 700">3 · Punkte</span><span style="font-size: 13px; color: #5D6370">Outfit · hell</span></div>
+<div style="font-size: 14px; line-height: 1.5; color: #4F5562">5 Punkte statt Zahlen; falsche Buchstaben verlieren ihre Karte.</div>
+<div style="display: flex; align-items: center; gap: 6px; margin-top: 2px"><span style="width: 20px; height: 20px; border-radius: 6px; background: #F1F0F6; box-shadow: inset 0 0 0 1px #D5D8DE"></span><span style="width: 20px; height: 20px; border-radius: 6px; background: #17865D"></span><span style="width: 20px; height: 20px; border-radius: 6px; background: #F5B935"></span><span style="width: 20px; height: 20px; border-radius: 6px; background: #E04848"></span><span style="margin-left: 8px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: #4F5562">17865D · F5B935 · E04848</span></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px; padding: 14px 0; border-bottom: 1px solid #ECEEF1">
+<div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px"><span style="font-size: 15px; font-weight: 700">4 · Marker</span><span style="font-size: 13px; color: #5D6370">Bricolage Grotesque · hell</span></div>
+<div style="font-size: 14px; line-height: 1.5; color: #4F5562">Leuchtstift für Richtig und Vielleicht, Falsch wird durchgestrichen.</div>
+<div style="display: flex; align-items: center; gap: 6px; margin-top: 2px"><span style="width: 20px; height: 20px; border-radius: 6px; background: #FFFFFF; box-shadow: inset 0 0 0 1px #D5D8DE"></span><span style="width: 20px; height: 20px; border-radius: 6px; background: #2FCB76"></span><span style="width: 20px; height: 20px; border-radius: 6px; background: #FFD23F"></span><span style="width: 20px; height: 20px; border-radius: 6px; background: #EF4A3C"></span><span style="margin-left: 8px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: #4F5562">2FCB76 · FFD23F · EF4A3C</span></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px; padding: 14px 0; border-bottom: 1px solid #ECEEF1">
+<div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px"><span style="font-size: 15px; font-weight: 700">5 · Kontrast</span><span style="font-size: 13px; color: #5D6370">JetBrains Mono · dunkel</span></div>
+<div style="font-size: 14px; line-height: 1.5; color: #4F5562">Farbenblind-tauglich: Blau, Orange, Grau plus Symbole.</div>
+<div style="display: flex; align-items: center; gap: 6px; margin-top: 2px"><span style="width: 20px; height: 20px; border-radius: 6px; background: #0E1625"></span><span style="width: 20px; height: 20px; border-radius: 6px; background: #2F6FE4"></span><span style="width: 20px; height: 20px; border-radius: 6px; background: #FF9F43"></span><span style="width: 20px; height: 20px; border-radius: 6px; background: #7A879C"></span><span style="margin-left: 8px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: #4F5562">2F6FE4 · FF9F43 · 7A879C</span></div>
+</div>
+</div>
+<p style="margin: 0; font-size: 14px; line-height: 1.55; color: #4F5562">Felder: Grund · Richtig · Vielleicht · Falsch. Jede Variante hat die drei Farbstufen als Tweaks und lässt sich live anpassen.</p>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<h3 style="margin: 0; font-size: 15px; font-weight: 700">Masse</h3>
+<p style="margin: 0; font-size: 15px; line-height: 1.55">Referenz 390 × 844 pt. Touch-Ziele mindestens 44 pt, Tasten 52 pt hoch, Abstand zwischen Kacheln 5–7 pt.</p>
+</div>
+</section>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1400}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

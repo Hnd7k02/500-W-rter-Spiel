@@ -1,0 +1,28 @@
+{
+  "v": 3,
+  "createdOnFiles": {"v": 1, "at": "2026-10-16T20:08:00Z"},
+  "title": "Word500 App – Designkonzept",
+  "launch": {"view": "canvas", "page": "final"},
+  "pages": [
+    {"id": "final", "name": "500 Wörter"},
+    {"id": "entwuerfe", "name": "Erste Entwürfe"}
+  ],
+  "boards": {
+    "Main.dc.html": {"x": 0, "y": 0, "w": 390, "h": 844, "title": "1 · Klar", "radius": 40, "page": "entwuerfe"},
+    "Nacht.dc.html": {"x": 470, "y": 0, "w": 390, "h": 844, "title": "2 · Nacht", "radius": 40, "page": "entwuerfe"},
+    "Punkte.dc.html": {"x": 940, "y": 0, "w": 390, "h": 844, "title": "3 · Punkte", "radius": 40, "page": "entwuerfe"},
+    "Marker.dc.html": {"x": 1410, "y": 0, "w": 390, "h": 844, "title": "4 · Marker", "radius": 40, "page": "entwuerfe"},
+    "Kontrast.dc.html": {"x": 1880, "y": 0, "w": 390, "h": 844, "title": "5 · Kontrast", "radius": 40, "page": "entwuerfe"},
+    "Uebergabe.dc.html": {"x": 0, "y": 964, "w": 1440, "h": 1400, "title": "Übergabe für Claude Code", "page": "entwuerfe"},
+    "Spiel.dc.html": {"x": 0, "y": 0, "w": 390, "h": 844, "title": "1 · Spiel (Deutsch)", "radius": 44, "page": "final"},
+    "Ausblenden.dc.html": {"x": 470, "y": 0, "w": 390, "h": 844, "title": "2 · Ausblenden aktiv", "radius": 44, "page": "final"},
+    "Gewonnen.dc.html": {"x": 940, "y": 0, "w": 390, "h": 844, "title": "3 · Englisch, gewonnen", "radius": 44, "page": "final"},
+    "Bausteine.dc.html": {"x": 1410, "y": 0, "w": 1200, "h": 1380, "title": "Bausteine", "radius": 28, "page": "final"}
+  },
+  "order": ["Main.dc.html", "Nacht.dc.html", "Punkte.dc.html", "Marker.dc.html", "Kontrast.dc.html", "Uebergabe.dc.html", "Spiel.dc.html", "Ausblenden.dc.html", "Gewonnen.dc.html", "Bausteine.dc.html"],
+  "notes": {
+    "titel": {"x": 0, "y": -300, "text": "Word500 als App · 5 Richtungen", "kind": "title1", "maxW": 2270, "page": "entwuerfe"},
+    "titelFinal": {"x": 0, "y": -300, "text": "500 Wörter · iOS-Konzept", "kind": "title1", "maxW": 2610, "page": "final"}
+  },
+  "designSystems": []
+}

@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>500 Wörter – Bausteine</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 1200px; height: 1380px; box-sizing: border-box; padding: 60px 64px; display: flex; flex-direction: column; gap: 36px; background: radial-gradient(90% 50% at 20% -10%, #FFFFFF 0%, rgba(255, 255, 255, 0) 60%), #F1F2F6; color: #1D1D1F; font-family: 'Plus Jakarta Sans', system-ui, sans-serif">
+<header style="display: flex; flex-direction: column; gap: 10px">
+<div style="font-size: 13px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: #6E6E73">500 Wörter · Designsystem</div>
+<h1 style="margin: 0; font-size: 44px; line-height: 1.05; font-weight: 800; letter-spacing: -0.03em">Bausteine</h1>
+<p style="margin: 0; font-size: 17px; line-height: 1.5; font-weight: 500; color: #4A4A50">Alle Zustände für den Nachbau. Masse und Verhalten stehen zusätzlich im Erstellungs-Prompt.</p>
+</header>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px">
+
+<section style="grid-column: span 2; display: flex; flex-direction: column; gap: 20px; padding: 26px 28px; border-radius: 28px; background: #FFFFFF; box-shadow: 0 18px 40px -18px rgba(16, 24, 40, 0.18), 0 2px 6px rgba(16, 24, 40, 0.04)">
+<div style="display: flex; flex-direction: column; gap: 4px"><h2 style="margin: 0; font-size: 17px; font-weight: 800">Markieren durch Antippen</h2><p style="margin: 0; font-size: 14px; font-weight: 600; color: #6E6E73">Eigene Notiz zum Merken – ändert die Wertung nie.</p></div>
+<div style="display: flex; align-items: flex-start; gap: 14px">
+<sc-for list="{{cycle}}" as="c" hint-placeholder-count="4">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 10px">
+<div style="width: 56px; height: 56px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 27px; font-weight: 800; background: {{c.bg}}; box-shadow: {{c.sh}}; color: {{c.fg}}; text-shadow: {{c.ts}}">E</div>
+<span style="font-size: 13px; font-weight: 700; color: #4A4A50">{{c.name}}</span>
+</div>
+<span aria-hidden="true" style="height: 56px; display: flex; align-items: center; color: #A1A5AE"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></span>
+</sc-for>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 10px">
+<div aria-hidden="true" style="width: 56px; height: 56px; box-sizing: border-box; border-radius: 16px; display: flex; align-items: center; justify-content: center; color: #6E6E73; box-shadow: inset 0 0 0 1.5px rgba(120, 128, 150, 0.35)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"></path><path d="M3 4v5h5"></path></svg></div>
+<span style="font-size: 13px; font-weight: 700; color: #4A4A50">von vorn</span>
+</div>
+</div>
+<div style="display: flex; align-items: center; gap: 18px; padding: 16px 18px; border-radius: 20px; background: #F6F7FA">
+<span style="font-size: 13px; font-weight: 800; color: #6E6E73; white-space: nowrap">Im Spielfeld</span>
+<div style="display: flex; align-items: center; gap: 14px">
+<div aria-hidden="true" style="display: flex; gap: 4px">
+<sc-for list="{{exampleCounts}}" as="ct" hint-placeholder-count="3">
+<div style="width: 26px; height: 26px; border-radius: 13px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; background: {{ct.bg}}; box-shadow: {{ct.sh}}; color: {{ct.fg}}">{{ct.n}}</div>
+</sc-for>
+</div>
+<div style="display: flex; gap: 6px">
+<sc-for list="{{exampleRow}}" as="c" hint-placeholder-count="5">
+<div style="width: 46px; height: 46px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 23px; font-weight: 800; background: {{c.bg}}; box-shadow: {{c.sh}}; color: {{c.fg}}; text-shadow: {{c.ts}}">{{c.ch}}</div>
+</sc-for>
+</div>
+</div>
+</div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 18px; padding: 26px 28px; border-radius: 28px; background: #FFFFFF; box-shadow: 0 18px 40px -18px rgba(16, 24, 40, 0.18), 0 2px 6px rgba(16, 24, 40, 0.04)">
+<div style="display: flex; flex-direction: column; gap: 4px"><h2 style="margin: 0; font-size: 17px; font-weight: 800">Wertung links</h2><p style="margin: 0; font-size: 14px; font-weight: 600; color: #6E6E73">Nur Anzahlen, nie welche Buchstaben.</p></div>
+<div style="display: flex; flex-direction: column; gap: 12px">
+<sc-for list="{{scores}}" as="s" hint-placeholder-count="4">
+<div style="display: flex; align-items: center; gap: 12px">
+<div style="width: 30px; height: 30px; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; background: {{s.bg}}; box-shadow: {{s.sh}}; color: {{s.fg}}">{{s.n}}</div>
+<span style="display: flex; align-items: center; gap: 7px; font-size: 14px; font-weight: 700; color: #1D1D1F"><span aria-hidden="true" style="display: flex; color: {{s.ic}}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{s.path}}"></path></svg></span>{{s.label}}</span>
+</div>
+</sc-for>
+</div>
+<p style="margin: 0; font-size: 13px; line-height: 1.45; font-weight: 600; color: #6E6E73">Reihenfolge immer gleich. Die Icons stehen einmal über den Spalten.</p>
+</section>
+
+<section style="grid-column: span 2; display: flex; flex-direction: column; gap: 20px; padding: 26px 28px; border-radius: 28px; background: #FFFFFF; box-shadow: 0 18px 40px -18px rgba(16, 24, 40, 0.18), 0 2px 6px rgba(16, 24, 40, 0.04)">
+<div style="display: flex; flex-direction: column; gap: 4px"><h2 style="margin: 0; font-size: 17px; font-weight: 800">Tastatur</h2><p style="margin: 0; font-size: 14px; font-weight: 600; color: #6E6E73">Jede Taste zeigt die stärkste Markierung ihres Buchstabens: Richtig vor Im Wort vor Falsch.</p></div>
+<div style="display: flex; align-items: flex-start; gap: 16px">
+<sc-for list="{{keyStates}}" as="k" hint-placeholder-count="5">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 10px">
+<div style="width: 44px; height: 54px; border-radius: 11px; display: flex; align-items: center; justify-content: center; font-size: 21px; font-weight: 700; background: {{k.bg}}; box-shadow: {{k.sh}}; color: {{k.fg}}">{{k.ch}}</div>
+<span style="font-size: 13px; font-weight: 700; color: #4A4A50">{{k.name}}</span>
+</div>
+</sc-for>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 10px">
+<div aria-hidden="true" style="width: 72px; height: 54px; border-radius: 11px; display: flex; align-items: center; justify-content: center; color: #FFFFFF; background: linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 52%), linear-gradient(180deg, #2A86F5, #0059D6); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 6px 14px -5px rgba(0, 89, 214, 0.6)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 5v6.5a3 3 0 0 1-3 3H6"></path><path d="M10 10.5l-4 4 4 4"></path></svg></div>
+<span style="font-size: 13px; font-weight: 700; color: #4A4A50">Prüfen</span>
+</div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 10px">
+<div aria-hidden="true" style="width: 72px; height: 54px; border-radius: 11px; display: flex; align-items: center; justify-content: center; color: #1D1D1F; background: #E3E5EB; box-shadow: inset 0 -1px 0 rgba(16, 24, 40, 0.08)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5h10.5A1.5 1.5 0 0 1 21 6.5v11a1.5 1.5 0 0 1-1.5 1.5H9l-6-7z"></path><path d="M12.5 9.5l5 5M17.5 9.5l-5 5"></path></svg></div>
+<span style="font-size: 13px; font-weight: 700; color: #4A4A50">Löschen</span>
+</div>
+</div>
+<div style="display: flex; align-items: center; gap: 18px; padding: 14px 18px; border-radius: 20px; background: #F6F7FA">
+<span style="font-size: 13px; font-weight: 800; color: #6E6E73; white-space: nowrap">QWERTZ</span>
+<div aria-hidden="true" style="flex: 1; display: flex; gap: 6px">
+<sc-for list="{{keyRow}}" as="k" hint-placeholder-count="10">
+<div style="flex: 1; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 700; background: {{k.bg}}; box-shadow: {{k.sh}}; color: {{k.fg}}">{{k.ch}}</div>
+</sc-for>
+</div>
+</div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 16px; padding: 26px 28px; border-radius: 28px; background: #FFFFFF; box-shadow: 0 18px 40px -18px rgba(16, 24, 40, 0.18), 0 2px 6px rgba(16, 24, 40, 0.04)">
+<div style="display: flex; flex-direction: column; gap: 4px"><h2 style="margin: 0; font-size: 17px; font-weight: 800">Ausblenden</h2><p style="margin: 0; font-size: 14px; font-weight: 600; color: #6E6E73">Schalter in der Tastatur-Karte.</p></div>
+<div style="display: flex; align-items: center; gap: 14px">
+<span aria-hidden="true" style="position: relative; flex-shrink: 0; width: 51px; height: 31px; border-radius: 16px; background: #E9E9EB; box-shadow: inset 0 0 0 1px rgba(16, 24, 40, 0.04)"><span style="position: absolute; top: 2px; left: 2px; width: 27px; height: 27px; border-radius: 14px; background: #FFFFFF; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15), 0 3px 1px rgba(0, 0, 0, 0.06)"></span></span>
+<span style="font-size: 14px; line-height: 1.4; font-weight: 600; color: #4A4A50"><strong style="color: #1D1D1F">Aus:</strong> alle Tasten normal und tippbar.</span>
+</div>
+<div style="display: flex; align-items: center; gap: 14px">
+<span aria-hidden="true" style="position: relative; flex-shrink: 0; width: 51px; height: 31px; border-radius: 16px; background: linear-gradient(180deg, #2A86F5, #0059D6); box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.14), 0 4px 14px rgba(10, 132, 255, 0.45)"><span style="position: absolute; top: 2px; left: 22px; width: 27px; height: 27px; border-radius: 14px; background: #FFFFFF; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15), 0 3px 1px rgba(0, 0, 0, 0.06)"></span></span>
+<span style="font-size: 14px; line-height: 1.4; font-weight: 600; color: #4A4A50"><strong style="color: #1D1D1F">An:</strong> Taste antippen schraffiert sie, nochmals antippen holt sie zurück.</span>
+</div>
+<div style="display: flex; align-items: center; gap: 12px; margin-top: 2px">
+<div aria-hidden="true" style="flex-shrink: 0; width: 44px; height: 54px; border-radius: 11px; display: flex; align-items: center; justify-content: center; font-size: 21px; font-weight: 700; background: repeating-linear-gradient(135deg, #D3D7DF 0px, #D3D7DF 2px, #F0F1F5 2px, #F0F1F5 6px); box-shadow: inset 0 0 0 1px rgba(16, 24, 40, 0.05); color: rgba(60, 60, 67, 0.3)">A</div>
+<span style="font-size: 13px; line-height: 1.45; font-weight: 600; color: #6E6E73">Auswahl bleibt pro Runde gespeichert. Ein neues Wort setzt sie zurück.</span>
+</div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 18px; padding: 26px 28px; border-radius: 28px; background: #FFFFFF; box-shadow: 0 18px 40px -18px rgba(16, 24, 40, 0.18), 0 2px 6px rgba(16, 24, 40, 0.04)">
+<div style="display: flex; flex-direction: column; gap: 4px"><h2 style="margin: 0; font-size: 17px; font-weight: 800">Eingabezeile</h2><p style="margin: 0; font-size: 14px; font-weight: 600; color: #6E6E73">Blauer Glow zeigt die nächste Stelle.</p></div>
+<div style="display: flex; align-items: flex-start; gap: 12px">
+<sc-for list="{{inputStates}}" as="t" hint-placeholder-count="4">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 10px">
+<div style="width: 50px; height: 50px; box-sizing: border-box; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 800; background: {{t.bg}}; box-shadow: {{t.sh}}; color: #1D1D1F">{{t.ch}}</div>
+<span style="font-size: 13px; font-weight: 700; color: #4A4A50">{{t.name}}</span>
+</div>
+</sc-for>
+</div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 18px; padding: 26px 28px; border-radius: 28px; background: #FFFFFF; box-shadow: 0 18px 40px -18px rgba(16, 24, 40, 0.18), 0 2px 6px rgba(16, 24, 40, 0.04)">
+<div style="display: flex; flex-direction: column; gap: 4px"><h2 style="margin: 0; font-size: 17px; font-weight: 800">Kopfzeile</h2><p style="margin: 0; font-size: 14px; font-weight: 600; color: #6E6E73">Sprache links, Würfel rechts.</p></div>
+<div style="display: flex; align-items: flex-start; gap: 18px">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 10px">
+<div aria-hidden="true" style="height: 44px; display: flex; align-items: center"><div style="display: flex; padding: 2px; border-radius: 12px; background: rgba(118, 118, 128, 0.12)"><span style="width: 46px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; letter-spacing: 0.03em; background: #FFFFFF; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12), 0 3px 1px rgba(0, 0, 0, 0.04)">DE</span><span style="width: 46px; height: 34px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; letter-spacing: 0.03em; color: #636366">EN</span></div></div>
+<span style="font-size: 13px; font-weight: 700; color: #4A4A50">Sprache</span>
+</div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 10px">
+<div aria-hidden="true" style="width: 44px; height: 44px; border-radius: 22px; display: flex; align-items: center; justify-content: center; color: #1D1D1F; background: linear-gradient(180deg, #FFFFFF, #F5F6F9); box-shadow: 0 8px 20px -6px rgba(16, 24, 40, 0.18), 0 1px 2px rgba(16, 24, 40, 0.06)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"></rect><circle cx="8.6" cy="8.6" r="1.3" fill="currentColor" stroke="none"></circle><circle cx="15.4" cy="8.6" r="1.3" fill="currentColor" stroke="none"></circle><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"></circle><circle cx="8.6" cy="15.4" r="1.3" fill="currentColor" stroke="none"></circle><circle cx="15.4" cy="15.4" r="1.3" fill="currentColor" stroke="none"></circle></svg></div>
+<span style="font-size: 13px; font-weight: 700; color: #4A4A50">Würfel</span>
+</div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 10px">
+<div aria-hidden="true" style="width: 44px; height: 44px; border-radius: 22px; display: flex; align-items: center; justify-content: center; color: #1D1D1F; background: linear-gradient(180deg, #FFFFFF, #F5F6F9); box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.14), 0 0 24px rgba(10, 132, 255, 0.45), 0 8px 20px -6px rgba(16, 24, 40, 0.18)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"></rect><circle cx="8.6" cy="8.6" r="1.3" fill="currentColor" stroke="none"></circle><circle cx="15.4" cy="8.6" r="1.3" fill="currentColor" stroke="none"></circle><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"></circle><circle cx="8.6" cy="15.4" r="1.3" fill="currentColor" stroke="none"></circle><circle cx="15.4" cy="15.4" r="1.3" fill="currentColor" stroke="none"></circle></svg></div>
+<span style="font-size: 13px; font-weight: 700; color: #4A4A50">nach Runde</span>
+</div>
+</div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 16px; padding: 26px 28px; border-radius: 28px; background: #FFFFFF; box-shadow: 0 18px 40px -18px rgba(16, 24, 40, 0.18), 0 2px 6px rgba(16, 24, 40, 0.04)">
+<div style="display: flex; flex-direction: column; gap: 4px"><h2 style="margin: 0; font-size: 17px; font-weight: 800">Meldungen</h2><p style="margin: 0; font-size: 14px; font-weight: 600; color: #6E6E73">Schwebende Karte, kurz und freundlich.</p></div>
+<div style="display: flex; align-items: center; gap: 10px; padding: 9px 12px 9px 9px; border-radius: 20px; background: #FFFFFF; box-shadow: 0 14px 30px -12px rgba(16, 24, 40, 0.28), 0 1px 4px rgba(16, 24, 40, 0.06), inset 0 0 0 1px rgba(16, 24, 40, 0.04)">
+<span aria-hidden="true" style="flex-shrink: 0; width: 32px; height: 32px; border-radius: 16px; display: flex; align-items: center; justify-content: center; color: #FFFFFF; background: linear-gradient(180deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0) 52%), linear-gradient(180deg, #36C670, #128A47); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 6px 14px -5px rgba(18, 138, 71, 0.65)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.2 4.2L19 7"></path></svg></span>
+<span style="display: flex; flex-direction: column; gap: 1px; line-height: 1.2"><span style="font-size: 14px; font-weight: 800">Geschafft!</span><span style="font-size: 12px; font-weight: 600; color: #6E6E73">PLANT in 4 Versuchen</span></span>
+</div>
+<div style="display: flex; align-items: center; gap: 10px; padding: 9px 12px 9px 9px; border-radius: 20px; background: #FFFFFF; box-shadow: 0 14px 30px -12px rgba(16, 24, 40, 0.28), 0 1px 4px rgba(16, 24, 40, 0.06), inset 0 0 0 1px rgba(16, 24, 40, 0.04)">
+<span aria-hidden="true" style="flex-shrink: 0; width: 32px; height: 32px; border-radius: 16px; display: flex; align-items: center; justify-content: center; color: #CC3540; background: linear-gradient(180deg, #FFF4F3, #FFE6E4); box-shadow: inset 0 0 0 1px rgba(204, 53, 64, 0.14)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v6"></path><path d="M12 17h.01"></path></svg></span>
+<span style="display: flex; flex-direction: column; gap: 1px; line-height: 1.2"><span style="font-size: 14px; font-weight: 800">Nicht in der Wortliste</span><span style="font-size: 12px; font-weight: 600; color: #6E6E73">Zeile wackelt kurz</span></span>
+</div>
+</section>
+
+<section style="grid-column: span 3; display: flex; flex-direction: column; gap: 18px; padding: 26px 28px; border-radius: 28px; background: #FFFFFF; box-shadow: 0 18px 40px -18px rgba(16, 24, 40, 0.18), 0 2px 6px rgba(16, 24, 40, 0.04)">
+<div style="display: flex; align-items: baseline; justify-content: space-between; gap: 16px"><h2 style="margin: 0; font-size: 17px; font-weight: 800">Farben</h2><p style="margin: 0; font-size: 14px; font-weight: 600; color: #6E6E73">Schrift: Plus Jakarta Sans · Radien: Kachel 14, Taste 10, Karte 28</p></div>
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px 20px">
+<sc-for list="{{swatches}}" as="w" hint-placeholder-count="8">
+<div style="display: flex; align-items: center; gap: 12px">
+<span aria-hidden="true" style="flex-shrink: 0; width: 34px; height: 34px; border-radius: 11px; background: {{w.bg}}; box-shadow: inset 0 0 0 1px rgba(16, 24, 40, 0.08)"></span>
+<span style="display: flex; flex-direction: column; gap: 2px; line-height: 1.25; min-width: 0"><span style="font-size: 14px; font-weight: 800">{{w.name}}</span><span style="font-size: 12px; font-weight: 600; color: #6E6E73">{{w.hex}}</span></span>
+</div>
+</sc-for>
+</div>
+</section>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1200,"height":1380}}'>
+class Component extends DCLogic {
+  renderVals() {
+    // Gleiche Werte wie im Spiel-Screen
+    const sheen = (a) => 'linear-gradient(180deg, rgba(255, 255, 255, ' + a + '), rgba(255, 255, 255, 0) 52%)';
+    const green = 'linear-gradient(180deg, #36C670, #128A47)';
+    const amber = 'linear-gradient(180deg, #FFD45E, #FFAD1F)';
+    const coral = 'linear-gradient(180deg, #FFF4F3, #FFE6E4)';
+    const red = '#CC3540';
+    const look = {
+      n: { bg: 'linear-gradient(180deg, #FFFFFF, #FAFBFC)', sh: '0 1px 2px rgba(16, 24, 40, 0.06), 0 6px 14px -4px rgba(16, 24, 40, 0.12), inset 0 0 0 1px rgba(16, 24, 40, 0.05)', fg: '#1D1D1F', ts: 'none', name: 'ohne' },
+      x: { bg: coral, sh: 'inset 0 0 0 1px rgba(204, 53, 64, 0.12), 0 1px 2px rgba(16, 24, 40, 0.04)', fg: red, ts: 'none', name: 'Falsch' },
+      v: { bg: sheen(0.4) + ', ' + amber, sh: 'inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 8px 18px -6px rgba(255, 165, 20, 0.6)', fg: '#5A3B00', ts: 'none', name: 'Im Wort' },
+      r: { bg: sheen(0.3) + ', ' + green, sh: 'inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 8px 18px -6px rgba(18, 138, 71, 0.6)', fg: '#FFFFFF', ts: '0 1px 1px rgba(0, 60, 25, 0.3)', name: 'Richtig' }
+    };
+    const chips = {
+      r: { bg: sheen(0.28) + ', ' + green, sh: 'inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 4px 10px -3px rgba(18, 138, 71, 0.55)', fg: '#FFFFFF' },
+      v: { bg: sheen(0.4) + ', ' + amber, sh: 'inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 4px 10px -3px rgba(255, 165, 20, 0.55)', fg: '#5A3B00' },
+      x: { bg: coral, sh: 'inset 0 0 0 1px rgba(204, 53, 64, 0.16)', fg: red },
+      zero: { bg: 'rgba(120, 128, 150, 0.10)', sh: 'none', fg: '#767B86' }
+    };
+    const keyLook = {
+      n: { bg: '#E9EBF0', sh: 'inset 0 -1px 0 rgba(16, 24, 40, 0.07)', fg: '#1D1D1F' },
+      x: { bg: coral, sh: 'inset 0 0 0 1px rgba(204, 53, 64, 0.10)', fg: red },
+      v: { bg: sheen(0.4) + ', ' + amber, sh: 'inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 5px 12px -5px rgba(255, 165, 20, 0.65)', fg: '#5A3B00' },
+      r: { bg: sheen(0.3) + ', ' + green, sh: 'inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 5px 12px -5px rgba(18, 138, 71, 0.65)', fg: '#FFFFFF' },
+      off: { bg: 'repeating-linear-gradient(135deg, #D3D7DF 0px, #D3D7DF 2px, #F0F1F5 2px, #F0F1F5 6px)', sh: 'inset 0 0 0 1px rgba(16, 24, 40, 0.05)', fg: 'rgba(60, 60, 67, 0.3)' }
+    };
+    const paths = {
+      r: 'M5 12.5l4.2 4.2L19 7',
+      v: 'M5 8h13M14.5 4.5L18 8l-3.5 3.5M19 16H6M9.5 12.5L6 16l3.5 3.5',
+      x: 'M7 7l10 10M17 7L7 17'
+    };
+    // Beispiel: KOHLE gegen WOLKE, eigene Markierungen; Tastenreihe mit Zuständen
+    const rowMarks = 'vrxvr';
+    const rowKeys = { Q: 'off', W: 'n', E: 'r', R: 'x', T: 'x', Z: 'n', U: 'n', I: 'off', O: 'r', P: 'x' };
+    return {
+      cycle: ['n', 'x', 'v', 'r'].map((k) => look[k]),
+      exampleCounts: [
+        { n: '2', bg: chips.r.bg, sh: chips.r.sh, fg: chips.r.fg },
+        { n: '2', bg: chips.v.bg, sh: chips.v.sh, fg: chips.v.fg },
+        { n: '1', bg: chips.x.bg, sh: chips.x.sh, fg: chips.x.fg }
+      ],
+      exampleRow: 'KOHLE'.split('').map((ch, i) => {
+        const st = look[rowMarks[i]];
+        return { ch: ch, bg: st.bg, sh: st.sh, fg: st.fg, ts: st.ts };
+      }),
+      scores: [
+        { n: '2', bg: chips.r.bg, sh: chips.r.sh, fg: chips.r.fg, ic: '#18994F', path: paths.r, label: 'richtige Stelle' },
+        { n: '2', bg: chips.v.bg, sh: chips.v.sh, fg: chips.v.fg, ic: '#E39A00', path: paths.v, label: 'im Wort, andere Stelle' },
+        { n: '1', bg: chips.x.bg, sh: chips.x.sh, fg: chips.x.fg, ic: red, path: paths.x, label: 'nicht im Wort' },
+        { n: '0', bg: chips.zero.bg, sh: chips.zero.sh, fg: chips.zero.fg, ic: '#A1A5AE', path: 'M6 12h12', label: 'Null bleibt grau' }
+      ],
+      keyStates: [
+        { ch: 'D', name: 'Normal', bg: '#F0F1F5', sh: 'inset 0 -1px 0 rgba(16, 24, 40, 0.07)', fg: '#1D1D1F' },
+        { ch: 'S', name: 'Falsch', bg: keyLook.x.bg, sh: keyLook.x.sh, fg: keyLook.x.fg },
+        { ch: 'K', name: 'Im Wort', bg: keyLook.v.bg, sh: keyLook.v.sh, fg: keyLook.v.fg },
+        { ch: 'O', name: 'Richtig', bg: keyLook.r.bg, sh: keyLook.r.sh, fg: keyLook.r.fg },
+        { ch: 'A', name: 'Ausgeblendet', bg: keyLook.off.bg, sh: keyLook.off.sh, fg: keyLook.off.fg }
+      ],
+      keyRow: 'QWERTZUIOP'.split('').map((ch) => {
+        const st = keyLook[rowKeys[ch]];
+        return { ch: ch, bg: st.bg, sh: st.sh, fg: st.fg };
+      }),
+      inputStates: [
+        { ch: 'W', name: 'Getippt', bg: '#FFFFFF', sh: '0 1px 2px rgba(16, 24, 40, 0.06), 0 6px 14px -4px rgba(16, 24, 40, 0.12), inset 0 0 0 1px rgba(16, 24, 40, 0.05)' },
+        { ch: '', name: 'Cursor', bg: '#FFFFFF', sh: '0 0 0 2px #0A84FF, 0 0 0 6px rgba(10, 132, 255, 0.12), 0 8px 20px -6px rgba(10, 132, 255, 0.5)' },
+        { ch: '', name: 'Rest', bg: 'rgba(255, 255, 255, 0.7)', sh: 'inset 0 0 0 1px rgba(16, 24, 40, 0.10)' },
+        { ch: '', name: 'Leer', bg: 'rgba(120, 128, 150, 0.10)', sh: 'inset 0 1px 2px rgba(16, 24, 40, 0.04)' }
+      ],
+      swatches: [
+        { name: 'Grund', hex: '#F1F2F6', bg: '#F1F2F6' },
+        { name: 'Karte', hex: '#FFFFFF', bg: '#FFFFFF' },
+        { name: 'Text', hex: '#1D1D1F · leise #6E6E73', bg: '#1D1D1F' },
+        { name: 'Fokus-Glow', hex: '#0A84FF', bg: '#0A84FF' },
+        { name: 'Richtig', hex: '#36C670 → #128A47', bg: green },
+        { name: 'Im Wort', hex: '#FFD45E → #FFAD1F · Text #5A3B00', bg: amber },
+        { name: 'Falsch', hex: '#FFF4F3 → #FFE6E4 · Text #CC3540', bg: coral },
+        { name: 'Aktion', hex: '#2A86F5 → #0059D6', bg: 'linear-gradient(180deg, #2A86F5, #0059D6)' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

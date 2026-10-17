@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>500 Wörter – Spiel</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; box-sizing: border-box; padding: 54px 14px 26px; display: flex; flex-direction: column; gap: 16px; overflow: hidden; background: radial-gradient(140% 60% at 50% -12%, #FFFFFF 0%, rgba(255, 255, 255, 0) 62%), #F1F2F6; color: #1D1D1F; font-family: 'Plus Jakarta Sans', system-ui, sans-serif">
+<header style="height: 44px; flex-shrink: 0; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center">
+<div role="group" aria-label="Sprache der Wörter" style="justify-self: start; display: flex; padding: 2px; border-radius: 12px; background: rgba(118, 118, 128, 0.12)">
+<button type="button" aria-pressed="{{seg.de.pressed}}" style="width: 46px; height: 34px; padding: 0; border: 0; border-radius: 10px; font-size: 13px; font-weight: 800; letter-spacing: 0.03em; cursor: pointer; background: {{seg.de.bg}}; color: {{seg.de.fg}}; box-shadow: {{seg.de.sh}}">DE</button>
+<button type="button" aria-pressed="{{seg.en.pressed}}" style="width: 46px; height: 34px; padding: 0; border: 0; border-radius: 10px; font-size: 13px; font-weight: 800; letter-spacing: 0.03em; cursor: pointer; background: {{seg.en.bg}}; color: {{seg.en.fg}}; box-shadow: {{seg.en.sh}}">EN</button>
+</div>
+<h1 style="margin: 0; font-size: 20px; font-weight: 800; letter-spacing: -0.02em; white-space: nowrap">500 Wörter</h1>
+<button type="button" aria-label="Neues Wort würfeln" style="justify-self: end; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 22px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #1D1D1F; background: linear-gradient(180deg, #FFFFFF, #F5F6F9); box-shadow: {{diceSh}}"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"></rect><circle cx="8.6" cy="8.6" r="1.3" fill="currentColor" stroke="none"></circle><circle cx="15.4" cy="8.6" r="1.3" fill="currentColor" stroke="none"></circle><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"></circle><circle cx="8.6" cy="15.4" r="1.3" fill="currentColor" stroke="none"></circle><circle cx="15.4" cy="15.4" r="1.3" fill="currentColor" stroke="none"></circle></svg></button>
+</header>
+<main style="flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center">
+<div style="position: relative; display: flex; flex-direction: column; gap: 7px">
+<div aria-hidden="true" style="height: 16px; display: flex; align-items: center; gap: 14px">
+<div style="display: flex; gap: 4px">
+<span style="width: 26px; display: flex; justify-content: center; color: #18994F"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.2 4.2L19 7"></path></svg></span>
+<span style="width: 26px; display: flex; justify-content: center; color: #E39A00"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h13"></path><path d="M14.5 4.5L18 8l-3.5 3.5"></path><path d="M19 16H6"></path><path d="M9.5 12.5L6 16l3.5 3.5"></path></svg></span>
+<span style="width: 26px; display: flex; justify-content: center; color: #CC3540"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7l10 10"></path><path d="M17 7L7 17"></path></svg></span>
+</div>
+</div>
+<sc-for list="{{rows}}" as="row" hint-placeholder-count="8">
+<div style="display: flex; align-items: center; gap: 14px; opacity: {{row.op}}">
+<div style="position: relative; display: flex; gap: 4px">
+<span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap">{{row.label}}</span>
+<sc-for list="{{row.counts}}" as="ct" hint-placeholder-count="3">
+<div aria-hidden="true" style="width: 26px; height: 26px; border-radius: 13px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; background: {{ct.bg}}; box-shadow: {{ct.sh}}; color: {{ct.fg}}">{{ct.n}}</div>
+</sc-for>
+</div>
+<div style="display: flex; gap: 6px">
+<sc-if value="{{row.guessed}}" hint-placeholder-val="{{ true }}">
+<sc-for list="{{row.cells}}" as="cell" hint-placeholder-count="5">
+<button type="button" aria-label="{{cell.label}}" style="width: 46px; height: 46px; padding: 0; border: 0; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 23px; font-weight: 800; cursor: pointer; background: {{cell.bg}}; box-shadow: {{cell.sh}}; color: {{cell.fg}}; text-shadow: {{cell.ts}}">{{cell.ch}}</button>
+</sc-for>
+</sc-if>
+<sc-if value="{{row.pending}}" hint-placeholder-val="{{ false }}">
+<sc-for list="{{row.cells}}" as="cell" hint-placeholder-count="5">
+<div style="width: 46px; height: 46px; box-sizing: border-box; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 23px; font-weight: 800; background: {{cell.bg}}; box-shadow: {{cell.sh}}; color: #1D1D1F">{{cell.ch}}</div>
+</sc-for>
+</sc-if>
+</div>
+</div>
+</sc-for>
+<sc-if value="{{won}}" hint-placeholder-val="{{ false }}">
+<div role="status" style="position: absolute; left: 50%; bottom: {{toastBottom}}; transform: translate(-50%, 50%); display: flex; align-items: center; gap: 12px; padding: 10px 10px 10px 12px; border-radius: 24px; white-space: nowrap; background: #FFFFFF; box-shadow: 0 24px 48px -16px rgba(16, 24, 40, 0.28), 0 2px 8px rgba(16, 24, 40, 0.06)">
+<span aria-hidden="true" style="width: 40px; height: 40px; border-radius: 20px; display: flex; align-items: center; justify-content: center; color: #FFFFFF; background: linear-gradient(180deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0) 52%), linear-gradient(180deg, #36C670, #128A47); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 8px 18px -6px rgba(18, 138, 71, 0.65)"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.2 4.2L19 7"></path></svg></span>
+<span style="display: flex; flex-direction: column; gap: 2px; line-height: 1.2"><span style="font-size: 16px; font-weight: 800">Geschafft!</span><span style="font-size: 13px; font-weight: 600; color: #6E6E73">{{toastSub}}</span></span>
+<button type="button" style="margin-left: 4px; height: 42px; padding: 0 16px 0 13px; border: 0; border-radius: 21px; display: flex; align-items: center; gap: 7px; font-size: 15px; font-weight: 800; cursor: pointer; color: #FFFFFF; background: linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 52%), linear-gradient(180deg, #2A86F5, #0059D6); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 8px 18px -6px rgba(0, 89, 214, 0.6)"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"></rect><circle cx="8.6" cy="8.6" r="1.4" fill="currentColor" stroke="none"></circle><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"></circle><circle cx="15.4" cy="15.4" r="1.4" fill="currentColor" stroke="none"></circle></svg>Neues Wort</button>
+</div>
+</sc-if>
+</div>
+</main>
+<nav aria-label="Tastatur" style="flex-shrink: 0; display: flex; flex-direction: column; gap: 8px; padding: 8px 8px 10px; border-radius: 28px; background: #FFFFFF; box-shadow: {{kb.sh}}">
+<div style="height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 4px 0 6px">
+<div style="display: flex; align-items: center; gap: 10px">
+<span aria-hidden="true" style="width: 30px; height: 30px; border-radius: 9px; background: {{kb.iconBg}}; box-shadow: inset 0 0 0 1px rgba(16, 24, 40, 0.06)"></span>
+<span style="display: flex; flex-direction: column; gap: 1px; line-height: 1.2"><span style="font-size: 14px; font-weight: 800">Ausblenden</span><span style="font-size: 12px; font-weight: 600; color: {{kb.hintFg}}">{{kb.hint}}</span></span>
+</div>
+<button type="button" role="switch" aria-checked="{{kb.on}}" aria-label="Ausblenden" style="position: relative; width: 51px; height: 31px; padding: 0; border: 0; border-radius: 16px; cursor: pointer; background: {{kb.track}}; box-shadow: {{kb.trackSh}}"><span aria-hidden="true" style="position: absolute; top: 2px; left: 2px; width: 27px; height: 27px; border-radius: 14px; background: #FFFFFF; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15), 0 3px 1px rgba(0, 0, 0, 0.06); transform: translateX({{kb.knobX}})"></span></button>
+</div>
+<div style="display: flex; gap: 6px">
+<sc-for list="{{k1}}" as="k" hint-placeholder-count="10">
+<button type="button" aria-label="{{k.label}}" aria-pressed="{{k.pressed}}" style="flex: 1; min-width: 0; height: 46px; padding: 0; border: 0; border-radius: 10px; font-size: 18px; font-weight: 700; cursor: pointer; background: {{k.bg}}; box-shadow: {{k.sh}}; color: {{k.fg}}">{{k.ch}}</button>
+</sc-for>
+</div>
+<div style="display: flex; gap: 6px; padding: 0 17px">
+<sc-for list="{{k2}}" as="k" hint-placeholder-count="9">
+<button type="button" aria-label="{{k.label}}" aria-pressed="{{k.pressed}}" style="flex: 1; min-width: 0; height: 46px; padding: 0; border: 0; border-radius: 10px; font-size: 18px; font-weight: 700; cursor: pointer; background: {{k.bg}}; box-shadow: {{k.sh}}; color: {{k.fg}}">{{k.ch}}</button>
+</sc-for>
+</div>
+<div style="display: flex; gap: 6px">
+<button type="button" aria-label="Wort prüfen" style="flex: 1.55; min-width: 0; height: 46px; padding: 0; border: 0; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #FFFFFF; background: linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 52%), linear-gradient(180deg, #2A86F5, #0059D6); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 6px 14px -5px rgba(0, 89, 214, 0.6)"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 5v6.5a3 3 0 0 1-3 3H6"></path><path d="M10 10.5l-4 4 4 4"></path></svg></button>
+<sc-for list="{{k3}}" as="k" hint-placeholder-count="7">
+<button type="button" aria-label="{{k.label}}" aria-pressed="{{k.pressed}}" style="flex: 1; min-width: 0; height: 46px; padding: 0; border: 0; border-radius: 10px; font-size: 18px; font-weight: 700; cursor: pointer; background: {{k.bg}}; box-shadow: {{k.sh}}; color: {{k.fg}}">{{k.ch}}</button>
+</sc-for>
+<button type="button" aria-label="Buchstabe löschen" style="flex: 1.55; min-width: 0; height: 46px; padding: 0; border: 0; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #1D1D1F; background: #E3E5EB; box-shadow: inset 0 -1px 0 rgba(16, 24, 40, 0.08)"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5h10.5A1.5 1.5 0 0 1 21 6.5v11a1.5 1.5 0 0 1-1.5 1.5H9l-6-7z"></path><path d="M12.5 9.5l5 5M17.5 9.5l-5 5"></path></svg></button>
+</div>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"sprache":{"editor":"enum","options":["DE","EN"],"default":"DE","section":"Zustand"},"zustand":{"editor":"enum","options":["laufend","gewonnen"],"default":"laufend","section":"Zustand"},"ausblenden":{"editor":"boolean","default":false,"section":"Zustand"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    // Ein Bauteil, mehrere Zustände: Sprache, laufend/gewonnen, Ausblenden an/aus
+    const lang = this.props.sprache === 'EN' ? 'EN' : 'DE';
+    const won = this.props.zustand === 'gewonnen';
+    const hideMode = this.props.ausblenden === true || this.props.ausblenden === 'true';
+
+    const ink = '#1D1D1F';
+    const red = '#CC3540';
+    const sheen = (a) => 'linear-gradient(180deg, rgba(255, 255, 255, ' + a + '), rgba(255, 255, 255, 0) 52%)';
+    const green = 'linear-gradient(180deg, #36C670, #128A47)';
+    const amber = 'linear-gradient(180deg, #FFD45E, #FFAD1F)';
+    const coral = 'linear-gradient(180deg, #FFF4F3, #FFE6E4)';
+
+    // Farbstufen: Richtig (laut, glänzend) > Im Wort (glänzend) > Falsch (leise, getönt)
+    const tile = {
+      n: { bg: 'linear-gradient(180deg, #FFFFFF, #FAFBFC)', sh: '0 1px 2px rgba(16, 24, 40, 0.06), 0 6px 14px -4px rgba(16, 24, 40, 0.10)', fg: ink, ts: 'none' },
+      x: { bg: coral, sh: 'inset 0 0 0 1px rgba(204, 53, 64, 0.10), 0 1px 2px rgba(16, 24, 40, 0.04)', fg: red, ts: 'none' },
+      v: { bg: sheen(0.4) + ', ' + amber, sh: 'inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 8px 18px -6px rgba(255, 165, 20, 0.6)', fg: '#5A3B00', ts: 'none' },
+      r: { bg: sheen(0.3) + ', ' + green, sh: 'inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 8px 18px -6px rgba(18, 138, 71, 0.6)', fg: '#FFFFFF', ts: '0 1px 1px rgba(0, 60, 25, 0.3)' }
+    };
+    const chip = {
+      r: { bg: sheen(0.28) + ', ' + green, sh: 'inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 4px 10px -3px rgba(18, 138, 71, 0.55)', fg: '#FFFFFF' },
+      v: { bg: sheen(0.4) + ', ' + amber, sh: 'inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 4px 10px -3px rgba(255, 165, 20, 0.55)', fg: '#5A3B00' },
+      x: { bg: coral, sh: 'inset 0 0 0 1px rgba(204, 53, 64, 0.16)', fg: red },
+      zero: { bg: 'rgba(120, 128, 150, 0.10)', sh: 'none', fg: '#767B86' },
+      slot: { bg: 'rgba(120, 128, 150, 0.05)', sh: 'none', fg: ink }
+    };
+    const slot = {
+      empty: { bg: 'rgba(120, 128, 150, 0.08)', sh: 'inset 0 1px 2px rgba(16, 24, 40, 0.04)' },
+      typed: { bg: '#FFFFFF', sh: '0 1px 2px rgba(16, 24, 40, 0.06), 0 6px 14px -4px rgba(16, 24, 40, 0.10)' },
+      cursor: { bg: '#FFFFFF', sh: '0 0 0 2px #0A84FF, 0 0 0 6px rgba(10, 132, 255, 0.12), 0 8px 20px -6px rgba(10, 132, 255, 0.5)' },
+      rest: { bg: 'rgba(255, 255, 255, 0.7)', sh: 'inset 0 0 0 1px rgba(16, 24, 40, 0.06)' }
+    };
+    const name = { r: 'richtig', v: 'im Wort', x: 'falsch' };
+
+    // Beispielpartien. m = eigene Markierung (x falsch, v im Wort, r richtig, n keine)
+    // s = Wertung des Spiels [richtig, im Wort, falsch]
+    const games = {
+      DE: [
+        { w: 'STERN', m: 'xxvxx', s: [0, 1, 4] },
+        { w: 'LAMPE', m: 'vxxxr', s: [1, 1, 3] },
+        { w: 'BLUME', m: 'xvnxr', s: [1, 1, 3] },
+        { w: 'KOHLE', m: 'vrxvr', s: [2, 2, 1] },
+        { w: 'WOLKE', m: 'rrrrr', s: [5, 0, 0] }
+      ],
+      EN: [
+        { w: 'HOUSE', m: 'xxxxx', s: [0, 0, 5] },
+        { w: 'CRANE', m: 'xxrrx', s: [2, 0, 3] },
+        { w: 'SLANT', m: 'xrrrr', s: [4, 0, 1] },
+        { w: 'PLANT', m: 'rrrrr', s: [5, 0, 0] }
+      ]
+    };
+    const all = games[lang];
+    const guesses = won ? all : all.slice(0, all.length - 1);
+    const input = won ? '' : all[all.length - 1].w.slice(0, 3);
+    const hatched = lang === 'DE' ? 'ACIQXY' : '';
+
+    const rows = [];
+    for (let r = 0; r < 8; r++) {
+      const g = guesses[r];
+      if (g) {
+        rows.push({
+          guessed: true,
+          pending: false,
+          op: 1,
+          label: 'Versuch ' + (r + 1) + ': ' + g.s[0] + ' richtig, ' + g.s[1] + ' im Wort, ' + g.s[2] + ' falsch',
+          counts: ['r', 'v', 'x'].map((k, i) => {
+            const st = g.s[i] > 0 ? chip[k] : chip.zero;
+            return { n: String(g.s[i]), bg: st.bg, sh: st.sh, fg: st.fg };
+          }),
+          cells: g.w.split('').map((ch, i) => {
+            const m = tile[g.m[i]] ? g.m[i] : 'n';
+            const st = tile[m];
+            return { ch: ch, bg: st.bg, sh: st.sh, fg: st.fg, ts: st.ts, label: name[m] ? ch + ', ' + name[m] : ch + ', ohne Markierung' };
+          })
+        });
+      } else {
+        const isActive = !won && r === guesses.length;
+        rows.push({
+          guessed: false,
+          pending: true,
+          op: won ? 0 : 1,
+          label: '',
+          counts: [0, 1, 2].map(() => ({ n: '', bg: chip.slot.bg, sh: chip.slot.sh, fg: chip.slot.fg })),
+          cells: [0, 1, 2, 3, 4].map((i) => {
+            let st = slot.empty;
+            let ch = '';
+            if (isActive) {
+              ch = input.charAt(i);
+              st = i < input.length ? slot.typed : (i === input.length ? slot.cursor : slot.rest);
+            }
+            return { ch: ch, bg: st.bg, sh: st.sh };
+          })
+        });
+      }
+    }
+    // Erfolgskarte mittig im frei gewordenen Bereich unter der Lösungszeile
+    const free = 8 - guesses.length;
+    const toastBottom = free > 0 ? ((free * 46 + (free - 1) * 7) / 2) + 'px' : '-60px';
+
+    // Taste = stärkste eigene Markierung (Richtig > Im Wort > Falsch).
+    // Ausblenden an: gewählte Tasten grau schraffiert; aus: alle Tasten wieder normal.
+    const rank = { x: 1, v: 2, r: 3 };
+    const best = {};
+    guesses.forEach((g) => {
+      g.w.split('').forEach((ch, i) => {
+        const m = g.m[i];
+        if (rank[m] && (!best[ch] || rank[m] > rank[best[ch]])) best[ch] = m;
+      });
+    });
+    const keyLook = {
+      n: { bg: '#F0F1F5', sh: 'inset 0 -1px 0 rgba(16, 24, 40, 0.07)', fg: ink },
+      x: { bg: coral, sh: 'inset 0 0 0 1px rgba(204, 53, 64, 0.10)', fg: red },
+      v: { bg: sheen(0.4) + ', ' + amber, sh: 'inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 5px 12px -5px rgba(255, 165, 20, 0.65)', fg: '#5A3B00' },
+      r: { bg: sheen(0.3) + ', ' + green, sh: 'inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 5px 12px -5px rgba(18, 138, 71, 0.65)', fg: '#FFFFFF' },
+      off: { bg: 'repeating-linear-gradient(135deg, #D3D7DF 0px, #D3D7DF 2px, #F0F1F5 2px, #F0F1F5 6px)', sh: 'inset 0 0 0 1px rgba(16, 24, 40, 0.05)', fg: 'rgba(60, 60, 67, 0.3)' }
+    };
+    const keys = (row) => row.split('').map((ch) => {
+      const m = best[ch] || 'n';
+      const isOff = hideMode && hatched.indexOf(ch) >= 0;
+      const st = isOff ? keyLook.off : keyLook[m];
+      return {
+        ch: ch,
+        bg: st.bg,
+        sh: st.sh,
+        fg: st.fg,
+        pressed: hideMode ? isOff : null,
+        label: isOff ? ch + ', ausgeblendet' : (name[m] ? ch + ', ' + name[m] : ch)
+      };
+    });
+
+    const segOn = { bg: '#FFFFFF', sh: '0 3px 8px rgba(0, 0, 0, 0.12), 0 3px 1px rgba(0, 0, 0, 0.04)', fg: ink, pressed: true };
+    const segOff = { bg: 'transparent', sh: 'none', fg: '#636366', pressed: false };
+    const kb = hideMode
+      ? {
+          on: true,
+          sh: '0 0 0 2px rgba(10, 132, 255, 0.55), 0 0 28px 2px rgba(10, 132, 255, 0.26), 0 18px 40px -14px rgba(16, 24, 40, 0.20)',
+          track: 'linear-gradient(180deg, #2A86F5, #0059D6)',
+          trackSh: '0 0 0 4px rgba(10, 132, 255, 0.14), 0 4px 14px rgba(10, 132, 255, 0.45)',
+          knobX: '20px',
+          hint: 'Tippe Buchstaben zum Ausblenden',
+          hintFg: '#0A6FE0',
+          iconBg: 'repeating-linear-gradient(135deg, #8CBDF8 0px, #8CBDF8 2px, #E8F2FF 2px, #E8F2FF 5px)'
+        }
+      : {
+          on: false,
+          sh: '0 18px 40px -14px rgba(16, 24, 40, 0.20), 0 2px 6px rgba(16, 24, 40, 0.05)',
+          track: '#E9E9EB',
+          trackSh: 'inset 0 0 0 1px rgba(16, 24, 40, 0.04)',
+          knobX: '0px',
+          hint: 'Buchstaben grau schraffieren',
+          hintFg: '#6E6E73',
+          iconBg: 'repeating-linear-gradient(135deg, #C9CDD6 0px, #C9CDD6 2px, #F0F1F5 2px, #F0F1F5 5px)'
+        };
+
+    return {
+      seg: { de: lang === 'DE' ? segOn : segOff, en: lang === 'EN' ? segOn : segOff },
+      diceSh: won
+        ? '0 0 0 4px rgba(10, 132, 255, 0.14), 0 0 24px rgba(10, 132, 255, 0.45), 0 8px 20px -6px rgba(16, 24, 40, 0.18)'
+        : '0 8px 20px -6px rgba(16, 24, 40, 0.18), 0 1px 2px rgba(16, 24, 40, 0.06)',
+      rows: rows,
+      won: won,
+      toastBottom: toastBottom,
+      toastSub: all[all.length - 1].w + ' in ' + guesses.length + ' Versuchen',
+      kb: kb,
+      k1: keys('QWERTZUIOP'),
+      k2: keys('ASDFGHJKL'),
+      k3: keys('YXCVBNM')
+    };
+  }
+}
+</script>
+</body>
+</html>
