@@ -38,11 +38,13 @@ Das Script `scripts/build-wordlists.mjs` schreibt `src/data/valid-de.json` (rund
 
 ## App-Icons neu erzeugen
 
-Das Icon liegt als `public/icon.svg` vor. Die PNGs (Favicon, PWA-Icons, iOS-Icon mit 180 px) erzeugt:
+Die Vorlagen liegen in `design/`: `app-icon.png` und `app-icon-maskable.png` (je 1024 × 1024 px, ohne Transparenz). Daraus erzeugt
 
 ```bash
 npm run icons
 ```
+
+in `public/` das iOS-Icon (180 px), die PWA-Icons (192 und 512 px), das maskierbare Icon (512 px, aus der maskierbaren Vorlage) und das Favicon (16, 32 und 48 px). Die erzeugten Dateien gehören ins Repo.
 
 ## Deployen auf GitHub Pages
 
@@ -74,9 +76,9 @@ src/
                  Ergebnis-Karte, Meldung, Dialog
   styles/        tokens.css (Design-Tokens) und app.css
   data/          Lösungswörter und Listen gültiger Rateversuche
-public/          App-Icon (SVG) und erzeugte PNGs
-scripts/         Wortlisten-Script
-design/          Referenzbilder, Quellen aus dem Design-Canvas, Inspiration
+public/          erzeugte App-Icons und Favicon
+scripts/         Scripts für Wortlisten und Icons
+design/          App-Icon-Vorlagen, Referenzbilder, Quellen aus dem Design-Canvas, Inspiration
 ```
 
 Der Spielstand liegt in `localStorage` unter dem Schlüssel `500w:v1`.
