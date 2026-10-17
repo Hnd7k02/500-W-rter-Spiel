@@ -38,7 +38,7 @@ Ein einziger Spiel-Screen mit wenigen Bedienelementen. Bewusst **nicht** enthalt
    - **falsch**: kommt nicht vor
 
    Die Summe ist immer 5.
-3. Das Spiel verrät nie, welche Buchstaben gemeint sind, und färbt keine Buchstaben automatisch ein. Einzige Ausnahme ist die Gewinnzeile.
+3. Das Spiel verrät nie von selbst, welche Buchstaben gemeint sind, und färbt keine Buchstaben automatisch ein. Ausnahmen sind die Gewinnzeile und Hinweise, die man selbst anfordert (siehe «Hinweis»).
 4. Bei 5 · 0 · 0 ist die Runde gewonnen. Ist das Wort nach 8 Versuchen nicht gefunden, ist die Runde verloren, und die Lösung wird angezeigt.
 
 ### Wertung (doppelte Buchstaben wie bei Wordle)
@@ -206,15 +206,15 @@ Von oben nach unten wie in `design/500-woerter-screens.png`. Die App ist eine Fl
 
 1. **Kopfzeile** (44 px hoch, drei Spalten):
    - links: Segment-Schalter `DE | EN`
-   - Mitte: Titel «500 Wörter»
-   - rechts: runder Würfel-Button (44 px)
+   - Mitte: Titel «500 Wörter», immer genau mittig
+   - rechts: runder Hinweis-Button «?» direkt links neben dem runden Würfel-Button (beide 44 px, gleicher Stil, Abstand 8 px)
 2. **Spielfeld** (`flex: 1; min-height: 0`), Inhalt vertikal zentriert:
-   - Über den drei Zahlen-Spalten steht je ein kleines Icon: Haken (grün), Doppelpfeil ⇄ (amber), Kreuz (rot).
+   - Icon-Reihe: Über den drei Zahlen-Spalten steht je ein kleines Icon: Haken (grün), Doppelpfeil ⇄ (amber), Kreuz (rot). In derselben Reihe rechts, bündig mit den Kacheln, die Pille «Farben löschen» mit Radierer-Icon (siehe «Farben löschen»).
    - 8 Zeilen. Pro Zeile links drei runde Zahlen-Chips (richtig, im Wort, falsch), rechts 5 Buchstaben-Kacheln.
 3. **Tastatur-Karte**: weisse Karte als letztes Element der Spalte (kein `position: fixed`), unten Abstand `env(safe-area-inset-bottom)`.
    - Oberste Reihe: Schraffur-Icon, «Ausblenden» mit Unterzeile «Buchstaben grau schraffieren», rechts ein iOS-Schalter.
-   - QWERTZ ohne Umlaute: `QWERTZUIOP`, `ASDFGHJKL`, dann [Prüfen] `YXCVBNM` [Löschen].
-   - Prüfen ist der blaue Verlaufs-Button links unten mit dem Symbol ↵. Löschen sitzt rechts unten mit dem Symbol ⌫. Beide bekommen ein `aria-label`.
+   - QWERTZ ohne Umlaute: `QWERTZUIOP`, `ASDFGHJKL`, dann [Löschen] `YXCVBNM` [Prüfen].
+   - Löschen sitzt links unten mit dem Symbol ⌫. Prüfen ist der blaue Verlaufs-Button rechts unten mit dem Symbol ↵. Beide bekommen ein `aria-label`.
 
 **Wenn der Platz knapp wird:**
 
@@ -228,8 +228,8 @@ Die Tastatur bleibt immer ganz sichtbar.
 
 ### Eingabe
 
-- Buchstaben-Tasten füllen die aktive Zeile von links, höchstens 5 Buchstaben.
-- Löschen entfernt den letzten Buchstaben.
+- Buchstaben-Tasten füllen die erste freie Stelle der aktiven Zeile von links und überspringen dabei Hinweis-Stellen. Zusammen mit den Hinweisen sind es höchstens 5 Buchstaben.
+- Löschen entfernt den hintersten getippten Buchstaben, nie einen Hinweis.
 - Die physische Tastatur funktioniert auch (A–Z, Enter, Backspace). Tasten mit Cmd, Ctrl oder Alt werden ignoriert.
 - Die nächste freie Kachel trägt den blauen Fokus-Glow.
 - Beim Prüfen:
@@ -237,12 +237,22 @@ Die Tastatur bleibt immer ganz sichtbar.
   - Wort nicht in der Liste: Zeile wackelt, Meldung «Nicht in der Wortliste»
   - Wort schon geraten: Zeile wackelt, Meldung «Schon versucht»
   - sonst: Die Zeile wird festgeschrieben, die Zahlen-Chips erscheinen nacheinander.
+- **Meldungen** erscheinen oben in voller Breite und decken die Kopfzeile kurz ab. Die verdeckten Buttons reagieren in dieser Zeit nicht.
 
 ### Markieren (eigene Notizen)
 
 - Antippen einer Kachel in einer bereits gewerteten Zeile schaltet weiter: ohne → Falsch → Im Wort → Richtig → ohne.
 - Markierungen sind nur Notizen und ändern die Wertung nie. Sie gelten pro Kachel.
-- Jede Tastatur-Taste zeigt die stärkste Markierung ihres Buchstabens über alle Zeilen: Richtig vor Im Wort vor Falsch. Ohne Markierung sieht die Taste normal aus.
+- Hinweis-Kacheln und die Gewinnzeile sind immer «Richtig» und lassen sich nicht umfärben.
+- Jede Tastatur-Taste zeigt die stärkste Markierung ihres Buchstabens über alle Zeilen: Richtig vor Im Wort vor Falsch. Hinweis-Buchstaben zählen als Richtig, auch schon in der Eingabezeile. Ohne Markierung sieht die Taste normal aus.
+
+### Farben löschen (Radierer)
+
+- Die Pille «Farben löschen» (Radierer-Icon und Text) steht rechts in der Icon-Reihe, bündig mit den Kacheln. Tippfläche mindestens 44 px hoch.
+- Sie ist nur sichtbar, wenn es mindestens eine eigene Markierung gibt. Solange die Sprechblase des Hinweises darüber liegt, ist sie ausgeblendet.
+- Antippen entfernt alle eigenen Markierungen in den gewerteten Zeilen. Die Tastaturfarben passen sich an.
+- Nicht betroffen: die grüne Gewinnzeile, Hinweis-Buchstaben und die Schraffur der Tastatur.
+- Danach erscheint 5 s lang die Meldung «Farben gelöscht» mit dem Button «Rückgängig». Er holt alle gelöschten Markierungen zurück.
 
 ### Ausblenden (Schraffier-Schalter)
 
@@ -259,10 +269,23 @@ Die Tastatur bleibt immer ganz sichtbar.
 - **Neues Wort** (Würfel oder nach Sieg/Niederlage): Schraffur leeren und Schalter ausschalten. Jede Sprache behält ihre eigene Schraffur pro Runde.
 - **Barrierefreiheit:** Gesperrte Tasten haben `aria-disabled="true"` und das Label «A, ausgeblendet».
 
+### Hinweis «?»
+
+- **Erster Tipp:** Der Button wirkt eingedrückt: etwas kleiner, hellblauer Grund, blaues «?», blauer Glow. Darunter erscheint die Sprechblase «Nochmals tippen für einen grünen Buchstaben».
+  - Nach 3 s oder bei einem Tipp woanders springt er zurück, ohne Hinweis. Dieser andere Tipp wirkt normal, eine Taste schreibt also ihren Buchstaben.
+  - Ein Tipp auf die Sprechblase schliesst sie nur.
+- **Zweiter Tipp:** Ein zufälliger Platz der aktuellen Zeile bekommt den richtigen Buchstaben der Lösung als grüne, gesperrte Kachel mit kurzem Glow. Der Button springt zurück.
+- **Platzwahl:** zufällig unter den Plätzen ohne Hinweis, leere Plätze zuerst. Sind alle gefüllt, ersetzt der Hinweis einen getippten Buchstaben.
+- **Tippen und Löschen** überspringen Hinweis-Plätze (siehe «Eingabe»).
+- **Schraffur:** Ist der Buchstabe ausgeblendet, wird die Schraffur aufgehoben.
+- **Wertung:** Hinweise zählen beim Prüfen normal mit. In der gewerteten Zeile bleiben sie grün und lassen sich nicht umfärben. Die Tastatur zeigt sie grün.
+- **Gesperrt** nach Rundenende und wenn alle 5 Plätze Hinweise sind.
+- Ein Hinweis zählt als angefangene Runde: Der Würfel fragt dann vorher nach.
+
 ### Würfel (neues Wort)
 
 - Ein Tippen auf den Würfel zieht ein neues Zufallswort in der aktiven Sprache.
-- Läuft die Runde (mindestens ein Versuch oder eine angefangene Eingabe), kommt vorher ein Dialog im iOS-Stil:
+- Läuft die Runde (mindestens ein Versuch, eine angefangene Eingabe oder ein Hinweis), kommt vorher ein Dialog im iOS-Stil:
   - Titel «Neues Wort?», Text «Die laufende Runde wird beendet.»
   - Buttons [Abbrechen] und [Neues Wort]
 - Nach Sieg oder Niederlage startet die neue Runde ohne Nachfrage.
@@ -286,17 +309,17 @@ Die Tastatur bleibt immer ganz sichtbar.
   - Sonst (Sieg im 7. oder 8. Versuch, Niederlage) ersetzt die Karte als kompakte Zeile in gleicher Höhe die Ausblenden-Reihe der Tastatur-Karte. Die Tastatur bleibt sichtbar.
 - **In beiden Fällen:**
   - Der Würfel bekommt einen blauen Glow.
-  - Es ist keine Eingabe mehr möglich. Markieren geht weiterhin, ausser in der Gewinnzeile.
+  - Es ist keine Eingabe mehr möglich, und «?» ist gesperrt. Markieren und «Farben löschen» gehen weiterhin, ausser in der Gewinnzeile.
 
 ### Speichern
 
 Alles liegt in `localStorage` unter dem versionierten Schlüssel `500w:v1`:
 
 - aktive Sprache
-- beide Runden: Lösung, Versuche mit Wertung und Markierungen, aktuelle Eingabe, ausgeblendete Buchstaben, Schalterzustand, Status
+- beide Runden: Lösung, Versuche mit Wertung, Markierungen und Hinweis-Plätzen, aktuelle Eingabe mit ihren Hinweisen, ausgeblendete Buchstaben, Schalterzustand, Status
 - die Shuffle-Bags
 
-Nach einem Neustart macht die App genau dort weiter.
+Nach einem Neustart macht die App genau dort weiter. Ältere Spielstände ohne Hinweise laden weiter, unter demselben Schlüssel.
 
 ## Design-Tokens
 
@@ -395,13 +418,53 @@ So werden die Tokens eingesetzt:
 | Prüfen, Schalter an, «Neues Wort» | `--action-bg` | `--action-shadow` bzw. `--switch-on-glow` |
 | Tastatur-Karte im Ausblende-Modus | `--card` | `--hide-glow`, dann `--card-shadow` |
 | Ergebnis-Karte, Meldungen | `--card` | `--toast-shadow` |
+| Pille «Farben löschen» | `--eraser-bg` | `--eraser-shadow`, Text `--eraser-ink`, Radius `--r-pill` |
+| «?» eingedrückt | `--hint-armed-bg` | Glow `--dice-glow`, Text `--hint-armed-ink`, Grösse `--hint-armed-scale` |
+| «?» gesperrt | wie der Würfel | Deckkraft `--disabled-opacity` |
+| Sprechblase | `--bubble-bg` | `--bubble-shadow`, Text `--bubble-ink`, Radius `--r-bubble`, höchstens `--bubble-max-width` breit |
+| Hinweis-Kachel | `--right-bg` | `--right-shadow`, frisch gesetzt zusätzlich `--hint-tile-glow` |
+| Meldung «Farben gelöscht» | `--card` | `--toast-shadow`, Icon `--toast-info-bg` / `--toast-info-ink`, Button `--toast-action-bg` / `--toast-action-ink` |
+
+Für Radierer, Hinweis und die Meldung mit «Rückgängig» kommen diese Tokens dazu, ebenfalls in `tokens.css`:
+
+```css
+:root {
+  /* Radierer «Farben löschen» */
+  --eraser-bg: #FFFFFF;
+  --eraser-ink: #5E626C;
+  --eraser-shadow: 0 1px 2px rgba(16, 24, 40, 0.06), 0 4px 12px -4px rgba(16, 24, 40, 0.16);
+  --r-pill: 14px;
+
+  /* Hinweis «?» */
+  --hint-armed-bg: #E8F2FF;
+  --hint-armed-ink: #0A6FE0;
+  --hint-armed-scale: 0.92;
+  --hint-tile-glow: 0 0 0 4px rgba(54, 198, 112, 0.24), 0 0 26px 4px rgba(54, 198, 112, 0.55);
+  --bubble-bg: #FFFFFF;
+  --bubble-ink: #1D1D1F;
+  --bubble-shadow: 0 16px 36px -12px rgba(16, 24, 40, 0.30), 0 2px 8px rgba(16, 24, 40, 0.08);
+  --bubble-max-width: 230px;
+  --r-bubble: 14px;
+  --disabled-opacity: 0.4;
+
+  /* Meldung mit Aktion («Rückgängig») */
+  --toast-info-bg: rgba(120, 128, 150, 0.10);
+  --toast-info-ink: #5E626C;
+  --toast-action-bg: rgba(10, 132, 255, 0.10);
+  --toast-action-ink: #0A6FE0;
+}
+```
 
 ### Masse (Referenz iPhone 390 × 844)
 
-- **Allgemein:** Seitenrand 14 px. Abstand Kopfzeile → Spielfeld → Tastatur je 16 px.
+- **Allgemein:** Seitenrand 14 px. Abstand Kopfzeile → Spielfeld → Tastatur je 16 px. Das Spielfeld hat oben zusätzlich 9 px Innenabstand, damit die Tippfläche des Radierers auch bei knappem Platz ganz hineinpasst.
+- **Kopfzeile:** Hinweis und Würfel je 44 px rund, Abstand 8 px.
 - **Kacheln:** Richtwert 46 px (Radius 14), Abstand 6 px, Zeilenabstand 7 px. Buchstaben halb so gross wie die Kachel, Gewicht 800.
 - **Zahlen-Chips:** 26 px rund, Abstand 4 px. Zahl 13 px, Gewicht 800. Abstand Chips → Kacheln 14 px.
-- **Icon-Reihe über den Chips:** 16 px hoch, Icons 15 px.
+- **Icon-Reihe über den Chips:** 28 px hoch, Icons 15 px.
+- **Pille «Farben löschen»:** 28 px hoch, Radius 14, Icon 15 px, Text 12 px mit Gewicht 700. Die Tippfläche reicht 9 px nach oben und 7 px nach unten (44 px), aber nie über die Kacheln.
+- **Sprechblase:** höchstens 230 px breit, Radius 14, Text 13 px mit Gewicht 700, zweizeilig zentriert. Sie sitzt 8 px unter dem «?», ihre Spitze zeigt auf den Button.
+- **Meldungen:** volle Breite über der Kopfzeile, mindestens 44 px hoch. «Rückgängig» ist 30 px hoch mit 44 px Tippfläche.
 - **Tastatur-Karte:**
   - Radius 28, Innenabstand 8 px (unten 10 px)
   - Ausblenden-Reihe 44 px hoch
@@ -410,12 +473,12 @@ So werden die Tokens eingesetzt:
   - zweite Reihe beidseitig um eine halbe Tastenbreite eingerückt (≈ 17 px)
 - **Schalter:** 51 × 31 px (iOS), Knopf 27 px.
 - **Segment-Schalter:** Spur mit 2 px Innenabstand, Segmente 46 × 34 px, Radius 12 bzw. 10.
-- **Titel:** 20 px, Gewicht 800, Laufweite −0.02em.
+- **Titel:** 20 px, Gewicht 800, Laufweite −0.02em. Auf schmalen Geräten kleiner: unter 360 px Breite 16 px, unter 340 px 15 px.
 
 ### Responsiv
 
-- Das Spielfeld bekommt `container-type: size`. Die Kachelgrösse ergibt sich aus seinem Platz: `--tile: clamp(30px, min((100cqw - 124px) / 5, (100cqh - 73px) / 8), 50px)`. Die Chips bleiben 26 px.
-- Kontrolliere während der Arbeit mit Playwright-Screenshots bei 375 × 667, 390 × 844 und 430 × 932: kein Scrollen, Tastatur ganz sichtbar, Kacheln mindestens 30 px. Playwright gehört nicht zu `npm test`.
+- Das Spielfeld bekommt `container-type: size`. Die Kachelgrösse ergibt sich aus seinem Platz: `--tile: clamp(30px, min((100cqw - 124px) / 5, (100cqh - 85px) / 8), 50px)`. Die Chips bleiben 26 px.
+- Kontrolliere während der Arbeit mit Playwright-Screenshots bei 375 × 667, 390 × 844 und 430 × 932: kein Scrollen, Tastatur ganz sichtbar, Kacheln mindestens 30 px, nichts kollidiert (Kopfzeile, Radierer, Sprechblase, Meldungen). Playwright gehört nicht zu `npm test`.
 - Desktop: App mittig mit höchstens 430 px Breite.
 - Technik:
   - `env(safe-area-inset-*)` mit `viewport-fit=cover`
@@ -431,6 +494,8 @@ Kurz und weich. Bei `prefers-reduced-motion` nur Überblendungen.
 - **Wertung:** Die Chips erscheinen nacheinander (je 60 ms) mit kleinem Pop.
 - **Fehler:** Die Zeile wackelt 300 ms, die Meldung erscheint oben für 1.6 s.
 - **Markieren:** Farbwechsel in 140 ms.
+- **Farben löschen:** Die Farben blenden in 140 ms aus, die Meldung «Farben gelöscht» bleibt 5 s. Die Pille blendet in 160 ms ein.
+- **Hinweis:** «?» schrumpft beim ersten Tipp auf 0.92, die Sprechblase blendet in 180 ms ein. Die neue Hinweis-Kachel federt auf und leuchtet 1.1 s grün nach.
 - **Schalter:** Der Knopf gleitet in 200 ms, der Glow blendet ein.
 - **Sieg:** Die Gewinnzeile färbt sich nacheinander grün (70 ms Abstand), die Ergebnis-Karte gleitet hoch.
 
@@ -440,6 +505,8 @@ Kurz und weich. Bei `prefers-reduced-motion` nur Überblendungen.
 - Kacheln mit `aria-label`, z. B. «S, falsch».
 - Jede Zeile mit Text für Screenreader, z. B. «Versuch 2: 1 richtig, 1 im Wort, 3 falsch».
 - Schalter mit `role="switch"`, Segment-Schalter und ausgeblendete Tasten (bei Schalter an) mit `aria-pressed`. Gesperrte Tasten (schraffiert bei Schalter aus) mit `aria-disabled="true"`.
+- Hinweis-Button mit `aria-label="Hinweis"` und `aria-pressed` (`"true"`, solange er eingedrückt ist), gesperrt mit `aria-disabled="true"`. Die Sprechblase hängt über `aria-describedby` am Button. Ein gesetzter Hinweis wird vorgelesen, z. B. «Hinweis an Stelle 3: L.».
+- Hinweis-Kacheln heissen z. B. «O, Hinweis». Die Eingabezeile nennt ihre Hinweise, z. B. «Versuch 5, Eingabe: W O L, Hinweis an Stelle 4: K».
 - Farbe trägt nie allein die Bedeutung: Dafür stehen die Icons über den Zahlen-Spalten.
 
 ## PWA und iOS
@@ -455,9 +522,8 @@ Kurz und weich. Bei `prefers-reduced-motion` nur Überblendungen.
   - `color-scheme: light`
 - **iOS:** `apple-mobile-web-app-capable`, `apple-mobile-web-app-status-bar-style: default` und ein `apple-touch-icon` mit 180 px.
 - **App-Icon:**
-  - hellgrauer Grund mit drei glänzenden Kacheln in Grün, Amber und Hellrot nebeneinander
-  - als `public/icon.svg` anlegen
-  - die PNGs mit `@vite-pwa/assets-generator` (Preset `minimal-2023`) erzeugen und committen
+  - Vorlagen in `design/`: `app-icon.png` und `app-icon-maskable.png`, je 1024 × 1024 px ohne Transparenz
+  - `npm run icons` (`scripts/build-icons.mjs`) erzeugt daraus in `public/` das iOS-Icon (180 px), die PWA-Icons (192 und 512 px), das maskierbare Icon (512 px, aus der maskierbaren Vorlage) und das Favicon (16, 32 und 48 px). Die erzeugten Dateien werden committet.
   - das 180-px-Icon ohne Transparenz und ohne eigene Rundung
 - Das Spiel ist offline voll spielbar.
 
@@ -469,8 +535,8 @@ src/
   data/solutions.json  data/valid-de.json  data/valid-en.json
   components/ Header  Board  Row  Tile  CountChips  Keyboard  HideSwitch  ResultCard  Toast  ConfirmDialog
   styles/tokens.css  styles/app.css
-public/icon.svg
-scripts/build-wordlists.mjs
+public/ (erzeugte Icons)
+scripts/build-wordlists.mjs  scripts/build-icons.mjs
 design/*.png
 ```
 
@@ -486,6 +552,18 @@ design/*.png
   - Schalter an: Tippen schraffiert statt zu schreiben.
   - Schalter aus: Die Schraffur bleibt, gesperrte Tasten schreiben weder per Tippen noch per physischer Tastatur.
   - Ein neues Wort leert die Schraffur.
+- Farben löschen:
+  - Die Pille erscheint erst mit einer eigenen Markierung.
+  - Antippen löscht alle eigenen Farben, die Tastatur passt sich an. Gewinnzeile, Hinweise und Schraffur bleiben.
+  - «Rückgängig» holt die Farben zurück. Nach 5 s ist die Meldung weg.
+- Tastatur: Die unterste Reihe lautet [Löschen] `YXCVBNM` [Prüfen].
+- Hinweis:
+  - Erst der zweite Tipp gibt einen Hinweis. Nach 3 s oder bei einem Tipp woanders springt «?» zurück.
+  - Platzwahl: leere Plätze zuerst, sonst wird ein getippter Buchstabe ersetzt, nie zweimal derselbe Platz.
+  - Tippen und Löschen überspringen Hinweise. Beim Prüfen zählen sie mit und bleiben grün und gesperrt.
+  - Die Schraffur des Hinweis-Buchstabens wird aufgehoben.
+  - Gesperrt nach Rundenende und bei 5 Hinweisen.
+  - Hinweise werden gespeichert und wieder geladen.
 - Sprache: Die beiden Runden bleiben getrennt erhalten.
 - Shuffle-Bag: 250 Ziehungen ohne Wiederholung. Nach dem Neumischen kommt das letzte Wort nicht sofort wieder.
 - Ergebnis-Karte: richtiger Platz bei Sieg mit freien Zeilen, bei Sieg im 8. Versuch und bei Niederlage.

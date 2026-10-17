@@ -2,15 +2,26 @@
 
 Ein Wort-Ratespiel fürs iPhone nach dem Prinzip von [word500.com](https://word500.com), als installierbare Web-App (PWA) im Look von iOS-Widgets. Gesucht ist ein Wort mit 5 Buchstaben, auf Deutsch oder Englisch. Läuft komplett offline, ohne Konto und ohne Tracking.
 
-![Die App: Spiel auf Deutsch, Ausblenden aktiv, Englisch gewonnen](docs/app.png)
+![Die App: Spiel auf Deutsch mit Hinweis-Buchstabe K, Ausblenden aktiv, Englisch gewonnen](docs/app.png)
 
 ## So wird gespielt
 
 - Gesucht ist ein zufälliges Wort mit 5 Buchstaben. Du hast 8 Versuche.
-- Nach jedem Versuch stehen links nur drei Zahlen: **richtig** (✓, richtige Stelle), **im Wort** (⇄, andere Stelle) und **falsch** (✕, kommt nicht vor). Welche Buchstaben gemeint sind, verrät das Spiel nie.
+- Nach jedem Versuch stehen links nur drei Zahlen: **richtig** (✓, richtige Stelle), **im Wort** (⇄, andere Stelle) und **falsch** (✕, kommt nicht vor). Welche Buchstaben gemeint sind, verrät das Spiel nie von selbst.
+- Unten links löschst du einen Buchstaben (⌫), unten rechts prüfst du dein Wort (↵).
 - Tippe auf eine Kachel, um dir Notizen zu machen: ohne → Falsch → Im Wort → Richtig → ohne. Die Tastatur zeigt pro Buchstabe deine stärkste Markierung.
+- **Farben löschen** (rechts über den Kacheln) entfernt alle deine Markierungen auf einmal. Die grüne Gewinnzeile, Hinweise und die Schraffur bleiben. Die Meldung «Farben gelöscht» bietet 5 Sekunden lang **Rückgängig** an.
 - Mit dem Schalter **Ausblenden** schraffierst du Buchstaben, die du ausschliessen willst (siehe unten).
+- Der **Hinweis «?»** gibt dir einen richtigen Buchstaben (siehe unten).
 - Der **Würfel** oben rechts zieht ein neues Wort. **DE | EN** wechselt die Sprache. Jede Sprache hat ihre eigene Runde.
+
+### Hinweis
+
+- **Einmal tippen:** «?» bleibt eingedrückt, eine Sprechblase sagt «Nochmals tippen für einen grünen Buchstaben». Nach 3 Sekunden oder bei einem Tipp woanders springt der Button ohne Hinweis zurück.
+- **Nochmals tippen:** An einer zufälligen Stelle der aktuellen Zeile erscheint der richtige Buchstabe als grüne, gesperrte Kachel. Leere Stellen kommen zuerst dran. Ist die Zeile voll, ersetzt der Hinweis einen getippten Buchstaben.
+- Beim Tippen und Löschen werden Hinweis-Stellen übersprungen. Beim Prüfen zählen sie normal mit und bleiben danach grün.
+- War der Buchstabe ausgeblendet, verschwindet seine Schraffur.
+- Nach Rundenende und wenn alle 5 Stellen Hinweise sind, ist «?» gesperrt.
 
 ### Ausblenden
 
