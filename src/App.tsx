@@ -139,7 +139,7 @@ export function App() {
         // Ein per Tab fokussierter Button löst wie gewohnt selbst aus.
         if (e.target instanceof Element && e.target.closest('button')) return;
         e.preventDefault();
-        void submit();
+        if (!e.repeat) void submit();
       } else if (e.key === 'Backspace') {
         e.preventDefault();
         dispatch({ type: 'backspace' });
