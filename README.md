@@ -9,8 +9,15 @@ Ein Wort-Ratespiel fürs iPhone nach dem Prinzip von [word500.com](https://word5
 - Gesucht ist ein zufälliges Wort mit 5 Buchstaben. Du hast 8 Versuche.
 - Nach jedem Versuch stehen links nur drei Zahlen: **richtig** (✓, richtige Stelle), **im Wort** (⇄, andere Stelle) und **falsch** (✕, kommt nicht vor). Welche Buchstaben gemeint sind, verrät das Spiel nie.
 - Tippe auf eine Kachel, um dir Notizen zu machen: ohne → Falsch → Im Wort → Richtig → ohne. Die Tastatur zeigt pro Buchstabe deine stärkste Markierung.
-- Mit dem Schalter **Ausblenden** schraffierst du Buchstaben auf der Tastatur, die du ausschliessen willst.
+- Mit dem Schalter **Ausblenden** schraffierst du Buchstaben, die du ausschliessen willst (siehe unten).
 - Der **Würfel** oben rechts zieht ein neues Wort. **DE | EN** wechselt die Sprache. Jede Sprache hat ihre eigene Runde.
+
+### Ausblenden
+
+- **Schalter an:** Tippe auf eine Buchstaben-Taste, um sie grau zu schraffieren. Nochmals tippen nimmt die Schraffur weg. In diesem Modus wird nicht geschrieben, die Tastatur-Karte leuchtet blau.
+- **Schalter aus:** Schraffierte Tasten bleiben schraffiert und sind gesperrt. Antippen tut nichts, auch die physische Tastatur ignoriert diese Buchstaben. Alle anderen Tasten schreiben normal, schon getippte Buchstaben bleiben stehen. Die Unterzeile zeigt, wie viele Buchstaben ausgeblendet sind, z. B. «3 Buchstaben ausgeblendet».
+- **Zurückholen:** Schalter wieder an und die Taste nochmals antippen.
+- **Neues Wort** (Würfel oder nach Sieg und Niederlage): Die Schraffur wird geleert, der Schalter geht aus. Deutsch und Englisch haben je ihre eigene Schraffur.
 
 ## Lokal starten
 

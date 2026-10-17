@@ -8,6 +8,7 @@ Hier liegen alle Vorlagen für die Web-App «500 Wörter».
 |---|---|---|
 | `500-woerter-screens.png` | Die drei Screens nebeneinander: Spiel Deutsch, Ausblenden aktiv, Englisch gewonnen (aus `quelle/` gerendert) | vorhanden |
 | `500-woerter-bausteine.png` | Alle Bausteine, Zustände und Farbwerte | vorhanden |
+| `500-woerter-prompt.md` | Der Auftrag (Erstellungs-Prompt) mit allen Regeln, Massen und Tests | vorhanden |
 | `app-icon.png` | App-Icon, 1024 × 1024 px ohne Transparenz. Vorlage für iOS-Icon, PWA-Icons und Favicon | vorhanden |
 | `app-icon-maskable.png` | Maskierbare Variante für Android, 1024 × 1024 px. Vorläufig aus `app-icon.png` abgeleitet (Inhalt auf 82 % verkleinert, damit er in die sichere Zone passt) | vorläufig |
 | `quelle/` | Quelltext der finalen Artboards aus dem Design-Canvas (`*.dc.html`) | vorhanden |
