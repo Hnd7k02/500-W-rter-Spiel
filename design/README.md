@@ -8,6 +8,8 @@ Hier liegen alle Vorlagen für die Web-App «500 Wörter».
 |---|---|---|
 | `500-woerter-screens.png` | Die drei Screens nebeneinander: Spiel Deutsch, Ausblenden aktiv, Englisch gewonnen (aus `quelle/` gerendert) | vorhanden |
 | `500-woerter-bausteine.png` | Alle Bausteine, Zustände und Farbwerte | vorhanden |
+| `app-icon.png` | App-Icon, 1024 × 1024 px ohne Transparenz. Vorlage für iOS-Icon, PWA-Icons und Favicon | vorhanden |
+| `app-icon-maskable.png` | Maskierbare Variante für Android, 1024 × 1024 px. Vorläufig aus `app-icon.png` abgeleitet (Inhalt auf 82 % verkleinert, damit er in die sichere Zone passt) | vorläufig |
 | `quelle/` | Quelltext der finalen Artboards aus dem Design-Canvas (`*.dc.html`) | vorhanden |
 | `quelle/entwuerfe/` | Frühere Entwürfe, nur zur Info, gelten **nicht** | vorhanden |
 | `inspiration/word500-*.png` | Screenshots vom Original word500.com (Spielprinzip, Markieren, Gewinnzeile) | vorhanden |
@@ -18,7 +20,9 @@ Hier liegen alle Vorlagen für die Web-App «500 Wörter».
 1. Im Repo auf den Ordner `design` tippen.
 2. **Add file → Upload files** wählen.
 3. Bilder auswählen, Dateinamen wie oben verwenden.
-4. Unten «Commit directly to the `claude/500-woerter-webapp-lqq8nn` branch» wählen und **Commit changes**.
+4. Unten «Commit directly to the `main` branch» wählen und **Commit changes**.
+
+Nach einem neuen App-Icon müssen die Icon-Grössen neu erzeugt werden (`npm run icons`, siehe README im Hauptordner).
 
 ## Links
 
