@@ -708,10 +708,15 @@ button:focus-visible {
   font-weight: 800;
 }
 
+.result__title {
+  white-space: nowrap;
+}
+
 .result__sub {
   font-size: 13px;
   font-weight: 600;
   color: var(--ink-soft);
+  text-wrap: balance;
 }
 
 .result__btn {
@@ -743,7 +748,8 @@ button:focus-visible {
   bottom: calc((var(--free) * var(--tile) + (var(--free) - 1) * 7px) / 2);
   translate: -50% 50%;
   width: max-content;
-  max-width: 100cqw;
+  /* Wie im Design darf die Karte minimal über den Seitenrand ragen (bei 390 px: 362,3 statt 362 px). */
+  max-width: calc(100cqw + 8px);
   padding: 10px 10px 10px 12px;
   border-radius: var(--r-result);
   background: var(--card);
@@ -754,6 +760,35 @@ button:focus-visible {
 
 .result--board .result__btn {
   margin-left: 4px;
+}
+
+/* Schmale Geräte oder langer Text («im ersten Versuch»): etwas enger, damit alles auf eine Zeile passt. */
+.result--board.result--tight {
+  gap: 10px;
+  padding: 9px 9px 9px 10px;
+}
+
+.result--board.result--tight .result__btn {
+  height: 40px;
+  margin-left: 0;
+  padding: 0 13px 0 11px;
+  gap: 6px;
+  font-size: 14px;
+}
+
+@container (max-width: 359px) {
+  .result--board {
+    gap: 10px;
+    padding: 9px 9px 9px 10px;
+  }
+
+  .result--board .result__btn {
+    height: 40px;
+    margin-left: 0;
+    padding: 0 13px 0 11px;
+    gap: 6px;
+    font-size: 14px;
+  }
 }
 
 /* In der Tastatur-Karte: kompakte Zeile in der Höhe der Ausblenden-Reihe. */

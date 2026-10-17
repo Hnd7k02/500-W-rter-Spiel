@@ -24,7 +24,7 @@ export function ResultCard({ round, variant, delayed, onNewWord }: ResultCardPro
   const { title, sub } = resultTexts(round);
   return (
     <div
-      className={`result result--${variant} ${won ? 'result--won' : 'result--lost'}`}
+      className={`result result--${variant} ${won ? 'result--won' : 'result--lost'}${sub.length > 20 ? ' result--tight' : ''}`}
       data-testid="result-card"
       style={delayed ? ({ '--result-delay': '420ms' } as CSSProperties) : undefined}
     >
