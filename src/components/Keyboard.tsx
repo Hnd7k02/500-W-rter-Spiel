@@ -63,17 +63,8 @@ export function Keyboard({ round, resultDelayed, onLetter, onEnter, onDelete, on
       )}
       <div className="kb-row">{ROWS[0].map(renderKey)}</div>
       <div className="kb-row kb-row--mid">{ROWS[1].map(renderKey)}</div>
+      {/* Unterste Reihe: [Löschen] Y X C V B N M [Prüfen] */}
       <div className="kb-row">
-        <button
-          type="button"
-          className="key key--wide key--action"
-          aria-label="Wort prüfen"
-          aria-disabled={!playing || undefined}
-          onClick={onEnter}
-        >
-          <EnterIcon />
-        </button>
-        {ROWS[2].map(renderKey)}
         <button
           type="button"
           className="key key--wide key--delete"
@@ -82,6 +73,16 @@ export function Keyboard({ round, resultDelayed, onLetter, onEnter, onDelete, on
           onClick={onDelete}
         >
           <BackspaceIcon />
+        </button>
+        {ROWS[2].map(renderKey)}
+        <button
+          type="button"
+          className="key key--wide key--action"
+          aria-label="Wort prüfen"
+          aria-disabled={!playing || undefined}
+          onClick={onEnter}
+        >
+          <EnterIcon />
         </button>
       </div>
     </section>

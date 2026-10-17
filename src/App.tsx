@@ -4,13 +4,16 @@ import { ConfirmDialog } from './components/ConfirmDialog';
 import { Header } from './components/Header';
 import { Keyboard } from './components/Keyboard';
 import { Toast, type ToastMessage } from './components/Toast';
-import { newSeed } from './game/bag';
+import { newSeed, seededRandom } from './game/bag';
 import { score } from './game/score';
 import {
   activeRound,
+  canHint,
   checkGuess,
   createInitialState,
+  currentWord,
   ensureActiveRound,
+  giveHint,
   isRoundInProgress,
   reducer,
 } from './game/state';
@@ -28,6 +31,12 @@ const ERRORS = {
   repeat: 'Schon versucht',
 } as const;
 
+/** So lange bleibt «?» nach dem ersten Tipp eingedrückt. */
+export const HINT_ARMED_MS = 3000;
+/** So lange lässt sich «Farben löschen» rückgängig machen. */
+export const UNDO_MS = 5000;
+const ERROR_MS = 1600;
+
 export function App() {
   const [state, dispatch] = useReducer(reducer, undefined, initState);
   const round = activeRound(state);
@@ -39,6 +48,8 @@ export function App() {
   const [fresh, setFresh] = useState<{ lang: Lang; row: number } | null>(null);
   /** Unsichtbarer Text für Screenreader nach jedem Versuch */
   const [announcement, setAnnouncement] = useState('');
+  /** «?» nach dem ersten Tipp: eingedrückt, der zweite Tipp gibt den Hinweis */
+  const [hintArmed, setHintArmed] = useState(false);
 
   // Handler lesen immer den neuesten Stand, auch nach dem Warten auf die Wortliste.
   const stateRef = useRef(state);
@@ -54,9 +65,31 @@ export function App() {
 
   useEffect(() => {
     if (!toast) return;
-    const timer = window.setTimeout(() => setToast(null), 1600);
+    const timer = window.setTimeout(() => setToast(null), toast.duration);
     return () => window.clearTimeout(timer);
   }, [toast]);
+
+  // «?» springt nach 3 s oder bei einem Tipp woanders zurück. Der Tipp selbst wirkt normal weiter.
+  // Erst beim Klick zurückspringen, nicht schon beim Berühren: Sonst taucht der Radierer unter der
+  // Sprechblase noch während desselben Tipps wieder auf und bekäme den Klick ab.
+  useEffect(() => {
+    if (!hintArmed) return;
+    const timer = window.setTimeout(() => setHintArmed(false), HINT_ARMED_MS);
+    const onClick = (e: Event) => {
+      if (!(e.target instanceof Element && e.target.closest('[data-hint-button]'))) setHintArmed(false);
+    };
+    document.addEventListener('click', onClick, true);
+    return () => {
+      window.clearTimeout(timer);
+      document.removeEventListener('click', onClick, true);
+    };
+  }, [hintArmed]);
+
+  // Nach Rundenende, Sprachwechsel oder neuem Wort ist «?» nicht mehr eingedrückt.
+  const hintEnabled = canHint(round);
+  useEffect(() => {
+    setHintArmed(false);
+  }, [state.lang, round.solution, hintEnabled]);
 
   // Wortliste der aktiven Sprache im Hintergrund laden, sobald der erste Screen steht.
   useEffect(() => {
@@ -67,7 +100,7 @@ export function App() {
   }, [state.lang]);
 
   const fail = useCallback((text: string) => {
-    setToast({ id: Date.now() + Math.random(), text });
+    setToast({ id: Date.now() + Math.random(), text, tone: 'error', duration: ERROR_MS });
     setShakeSignal((n) => n + 1);
   }, []);
 
@@ -76,7 +109,8 @@ export function App() {
     const { lang } = stateRef.current;
     const before = stateRef.current.rounds[lang];
     if (!before || before.status !== 'playing') return;
-    const word = before.input;
+    // Hinweis-Buchstaben zählen normal mit.
+    const word = currentWord(before);
     const precheck = checkGuess(before, word);
     if (precheck !== 'ok') {
       fail(ERRORS[precheck]);
@@ -97,7 +131,7 @@ export function App() {
 
     const now = stateRef.current;
     const current = now.rounds[lang];
-    if (now.lang !== lang || !current || current.status !== 'playing' || current.input !== word) return;
+    if (now.lang !== lang || !current || current.status !== 'playing' || currentWord(current) !== word) return;
     const check = checkGuess(current, word, valid);
     if (check !== 'ok') {
       fail(ERRORS[check]);
@@ -119,6 +153,44 @@ export function App() {
     setFresh(null);
     dispatch({ type: 'newRound', seed: newSeed() });
   }, []);
+
+  // «?»: Der erste Tipp drückt den Button ein, erst der zweite gibt einen grünen Buchstaben.
+  const onHint = () => {
+    if (!canHint(round)) return;
+    if (!hintArmed) {
+      setHintArmed(true);
+      setAnnouncement('Nochmals tippen für einen grünen Buchstaben.');
+      return;
+    }
+    const seed = newSeed();
+    const next = giveHint(round, seededRandom(seed));
+    const col = next.hints.find((c) => !round.hints.includes(c));
+    if (col !== undefined) setAnnouncement(`Hinweis an Stelle ${col + 1}: ${round.solution[col]}.`);
+    setHintArmed(false);
+    dispatch({ type: 'hint', seed });
+  };
+
+  // Radierer: alle eigenen Markierungen weg, 5 s lang rückgängig zu machen.
+  const onClearMarks = () => {
+    const { lang } = state;
+    const { solution } = round;
+    const marks = round.guesses.map((g) => [...g.marks]);
+    dispatch({ type: 'clearMarks' });
+    const id = Date.now() + Math.random();
+    setToast({
+      id,
+      text: 'Farben gelöscht',
+      tone: 'info',
+      duration: UNDO_MS,
+      action: {
+        label: 'Rückgängig',
+        onAction: () => {
+          dispatch({ type: 'restoreMarks', lang, solution, marks });
+          setToast((t) => (t?.id === id ? null : t));
+        },
+      },
+    });
+  };
 
   const onDice = () => {
     if (isRoundInProgress(round)) setConfirmOpen(true);
@@ -163,13 +235,23 @@ export function App() {
   return (
     <>
       <div className="app" inert={confirmOpen} onMouseDown={keepFocus}>
-        <Header lang={state.lang} diceGlow={round.status !== 'playing'} onLang={onLang} onDice={onDice} />
+        <Header
+          lang={state.lang}
+          diceGlow={round.status !== 'playing'}
+          hintArmed={hintArmed}
+          hintEnabled={hintEnabled}
+          onLang={onLang}
+          onHint={onHint}
+          onDice={onDice}
+        />
         <Board
           round={round}
           popRow={popRow}
           celebrate={celebrate}
           shakeSignal={shakeSignal}
           onMark={(row, col) => dispatch({ type: 'mark', row, col })}
+          onClearMarks={onClearMarks}
+          toolsCovered={hintArmed}
           onNewWord={startNewWord}
         />
         <Keyboard

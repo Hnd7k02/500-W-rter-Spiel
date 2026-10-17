@@ -122,3 +122,14 @@ export function AlertIcon({ size = 16, strokeWidth = 3 }: IconProps) {
     </Svg>
   );
 }
+
+/** Radiergummi für «Farben löschen». */
+export function EraserIcon({ size = 15, strokeWidth = 2.1 }: IconProps) {
+  return (
+    <Svg size={size} strokeWidth={strokeWidth}>
+      <path d="M7 20.5 3.2 16.7a1.7 1.7 0 0 1 0-2.4L13.3 4.2a1.7 1.7 0 0 1 2.4 0l4.1 4.1a1.7 1.7 0 0 1 0 2.4L10.9 20.5Z" />
+      <path d="M20.5 20.5H10.9" />
+      <path d="m7.9 9.6 6.5 6.5" />
+    </Svg>
+  );
+}

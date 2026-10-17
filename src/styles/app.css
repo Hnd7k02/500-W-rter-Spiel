@@ -89,14 +89,14 @@ button:focus-visible {
 
 /*
  * Wird der Platz knapp, schrumpfen zuerst die Kacheln (bis 30 px, siehe .board).
- * Erst wenn das Spielfeld selbst mit 30-px-Kacheln nicht mehr passt (313 px), sinken die Tasten
- * bis auf 40 px. 483 px = Spielfeld 313 + Kopfzeile, Abstände und Tastatur ohne Tasten 170.
+ * Erst wenn das Spielfeld selbst mit 30-px-Kacheln nicht mehr passt (325 px plus 9 px Luft oben),
+ * sinken die Tasten bis auf 40 px. 504 px = Spielfeld 334 + Kopfzeile, Abstände und Tastatur ohne Tasten 170.
  */
 @supports (height: 100dvh) {
   .app {
     --key-h: clamp(
       40px,
-      (100dvh - env(safe-area-inset-top) - max(env(safe-area-inset-bottom), 14px) - 483px) / 3,
+      (100dvh - env(safe-area-inset-top) - max(env(safe-area-inset-bottom), 14px) - 504px) / 3,
       46px
     );
   }
@@ -148,15 +148,35 @@ button:focus-visible {
   white-space: nowrap;
 }
 
+/* Schmale Geräte: Links und rechts stehen je 96 px Buttons, der Titel wird kleiner. */
 @media (max-width: 359px) {
   .title {
-    font-size: 17px;
+    font-size: 16px;
   }
 }
 
-.dice {
+@media (max-width: 339px) {
+  .title {
+    font-size: 15px;
+    letter-spacing: -0.03em;
+  }
+}
+
+.header {
   position: relative;
+  z-index: 5;
+}
+
+/* Rechts: Hinweis «?» und Würfel, gleich breit wie der Sprach-Schalter links, damit der Titel mittig bleibt. */
+.header__actions {
   justify-self: end;
+  display: flex;
+  gap: 8px;
+}
+
+.round-btn {
+  position: relative;
+  flex: none;
   width: 44px;
   height: 44px;
   border-radius: 22px;
@@ -167,7 +187,7 @@ button:focus-visible {
   box-shadow: var(--dice-shadow);
 }
 
-.dice::after {
+.round-btn::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -182,9 +202,93 @@ button:focus-visible {
   opacity: 1;
 }
 
-.dice:active,
+.round-btn:active,
 .segment__btn:active {
   filter: var(--key-pressed-filter);
+}
+
+/* Hinweis «?» */
+
+.hint {
+  position: relative;
+}
+
+.hint__btn {
+  font-size: 21px;
+  font-weight: 800;
+  line-height: 1;
+  transition:
+    transform 160ms var(--ease-out),
+    color 160ms ease;
+}
+
+.hint__btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--hint-armed-bg);
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+
+.hint__btn > span {
+  position: relative;
+}
+
+/* Erster Tipp: eingedrückt, hellblau, blaues «?», blauer Glow */
+.hint__btn[aria-pressed='true'] {
+  transform: scale(var(--hint-armed-scale));
+  color: var(--hint-armed-ink);
+}
+
+.hint__btn[aria-pressed='true']::before,
+.hint__btn[aria-pressed='true']::after {
+  opacity: 1;
+}
+
+.hint__btn[aria-disabled='true'] {
+  cursor: default;
+  opacity: var(--disabled-opacity);
+}
+
+.hint__btn[aria-disabled='true']:active {
+  filter: none;
+}
+
+/* Sprechblase unter «?», rechtsbündig mit dem Würfel, Spitze zeigt auf «?» */
+/* Liegt über der Symbolzeile (Radierer ist so lange ausgeblendet) und endet über der ersten
+   Kachelreihe. Fängt Tipps selbst ab: Ein Tipp auf die Blase schliesst sie nur. */
+.hint__bubble {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 8px);
+  right: -52px;
+  width: max-content;
+  max-width: min(var(--bubble-max-width), calc(100vw - 28px));
+  padding: 8px 13px;
+  border-radius: var(--r-bubble);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.3;
+  text-align: center;
+  color: var(--bubble-ink);
+  background: var(--bubble-bg);
+  box-shadow: var(--bubble-shadow);
+  cursor: default;
+  animation: bubble-in 180ms var(--ease-out) both;
+}
+
+.hint__bubble::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  right: 68px;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px 0 0;
+  background: inherit;
+  transform: rotate(45deg);
 }
 
 /* ---------- Spielfeld ---------- */
@@ -194,6 +298,8 @@ button:focus-visible {
   min-height: 0;
   display: flex;
   flex-direction: column;
+  /* Oben Luft für die 44-px-Tippfläche des Radierers, auch wenn das Spielfeld knapp ist */
+  padding-top: 9px;
   container-type: size;
   /* Erst wenn gar nichts mehr hilft (Querformat, Safari-Leisten), scrollt nur das Spielfeld. */
   overflow-x: hidden;
@@ -217,15 +323,59 @@ button:focus-visible {
 
 @supports (container-type: size) {
   .board {
-    --tile: clamp(30px, min((100cqw - 124px) / 5, (100cqh - 73px) / 8), 50px);
+    /* 85 px = Icon-Reihe 28 + 8 Zeilenabstände à 7 + 1 */
+    --tile: clamp(30px, min((100cqw - 124px) / 5, (100cqh - 85px) / 8), 50px);
   }
 }
 
+/* Icon-Reihe: Spalten-Icons über den Chips, rechtsbündig über den Kacheln der Radierer */
 .board__icons {
-  height: 16px;
+  height: 28px;
   display: flex;
   align-items: center;
+  gap: 14px;
+}
+
+.board__legend {
+  display: flex;
   gap: 4px;
+}
+
+.board__tools {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.eraser {
+  position: relative;
+  height: 28px;
+  padding: 0 11px 0 9px;
+  border-radius: var(--r-pill);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  color: var(--eraser-ink);
+  background: var(--eraser-bg);
+  box-shadow: var(--eraser-shadow);
+  animation: fade-in 160ms ease both;
+}
+
+/* Tippfläche 44 px hoch: nach oben in den freien Raum, nach unten nur bis zu den Kacheln */
+.eraser::before {
+  content: '';
+  position: absolute;
+  top: -9px;
+  right: -4px;
+  bottom: -7px;
+  left: -4px;
+}
+
+.eraser:active {
+  filter: var(--key-pressed-filter);
 }
 
 .board__icon {
@@ -419,6 +569,20 @@ button:focus-visible {
 
 .tile--win {
   cursor: default;
+}
+
+.tile--hint-new {
+  animation: tile-pop 220ms var(--ease-spring);
+}
+
+.tile--hint-new::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: var(--hint-tile-glow);
+  pointer-events: none;
+  animation: hint-glow 1100ms ease-out both;
 }
 
 /* Sieg: Die Gewinnzeile färbt sich nacheinander grün. */
@@ -846,10 +1010,11 @@ button:focus-visible {
 
 /* ---------- Meldungen ---------- */
 
+/* Meldungen liegen genau über der Kopfzeile und decken sie ganz ab, solange sie sichtbar sind. */
 .toast-region {
   position: absolute;
   z-index: 20;
-  top: calc(env(safe-area-inset-top) + 7px);
+  top: calc(env(safe-area-inset-top) + 8px);
   left: 14px;
   right: 14px;
   display: flex;
@@ -858,17 +1023,72 @@ button:focus-visible {
 }
 
 .toast {
+  --toast-ms: 1600ms;
   display: flex;
   align-items: center;
   gap: 10px;
-  max-width: 100%;
+  width: 100%;
+  min-height: 44px;
   padding: 7px 18px 7px 7px;
+  /* Verdeckte Buttons der Kopfzeile sollen nicht unsichtbar mitreagieren. */
+  pointer-events: auto;
   border-radius: var(--r-toast);
   font-size: 15px;
   font-weight: 800;
   background: var(--card);
   box-shadow: var(--toast-shadow);
-  animation: toast 1600ms var(--ease-out) both;
+  animation:
+    toast-in 200ms var(--ease-out) both,
+    toast-out 260ms ease-in calc(var(--toast-ms) - 260ms) forwards;
+}
+
+.toast:has(.toast__action) {
+  padding-right: 7px;
+}
+
+.toast__text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.toast__action {
+  position: relative;
+  flex: none;
+  height: 30px;
+  margin-left: 4px;
+  padding: 0 12px;
+  border-radius: 15px;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--toast-action-ink);
+  background: var(--toast-action-bg);
+  pointer-events: auto;
+}
+
+/* Tippfläche 44 px */
+.toast__action::before {
+  content: '';
+  position: absolute;
+  inset: -7px -4px;
+}
+
+.toast__action:active {
+  filter: var(--key-pressed-filter);
+}
+
+@media (max-width: 359px) {
+  .toast {
+    gap: 8px;
+    font-size: 14px;
+  }
+
+  .toast__action {
+    padding: 0 10px;
+    font-size: 13px;
+  }
 }
 
 .toast__icon {
@@ -881,6 +1101,12 @@ button:focus-visible {
   color: var(--wrong-ink);
   background: var(--wrong-bg);
   box-shadow: var(--wrong-shadow-chip);
+}
+
+.toast--info .toast__icon {
+  color: var(--toast-info-ink);
+  background: var(--toast-info-bg);
+  box-shadow: none;
 }
 
 /* ---------- Dialog im iOS-Stil ---------- */
@@ -1009,30 +1235,39 @@ button:focus-visible {
   }
 }
 
-@keyframes toast {
-  0% {
+@keyframes toast-in {
+  from {
     opacity: 0;
     transform: translateY(-10px) scale(0.96);
   }
-  12%,
-  84% {
-    opacity: 1;
-    transform: none;
-  }
-  100% {
+}
+
+@keyframes toast-out {
+  to {
     opacity: 0;
     transform: translateY(-6px);
   }
 }
 
-@keyframes toast-fade {
-  0%,
-  100% {
+@keyframes fade-out {
+  to {
     opacity: 0;
   }
-  12%,
-  84% {
+}
+
+@keyframes bubble-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes hint-glow {
+  from {
     opacity: 1;
+  }
+  to {
+    opacity: 0;
   }
 }
 
@@ -1064,7 +1299,16 @@ button:focus-visible {
   }
 
   .toast {
-    animation-name: toast-fade;
+    animation-name: fade-in, fade-out;
+  }
+
+  .hint__bubble,
+  .tile--hint-new {
+    animation-name: fade-in;
+  }
+
+  .hint__btn[aria-pressed='true'] {
+    transform: none;
   }
 
   .switch__knob {
