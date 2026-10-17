@@ -7,6 +7,7 @@ import {
   cycleMark,
   deleteLetter,
   isHideActive,
+  isLocked,
   isRoundInProgress,
   keyMarks,
   pressPhysicalKey,
@@ -124,27 +125,76 @@ describe('Ausblenden', () => {
     expect(r.input).toBe('A');
   });
 
-  it('Schalter aus: alles normal, die Auswahl bleibt für die Runde erhalten', () => {
+  it('Schalter aus: die Schraffur bleibt, gesperrte Buchstaben schreiben weder per Tippen noch physisch', () => {
     let state: GameState = stateWith({ de: playedRound('WOLKE', []) });
+    const de = () => state.rounds.de!;
+    state = reducer(state, { type: 'tapKey', letter: 'K' }); // schon getippt
     state = reducer(state, { type: 'toggleHideMode' });
     state = reducer(state, { type: 'tapKey', letter: 'X' });
+    state = reducer(state, { type: 'tapKey', letter: 'K' });
     state = reducer(state, { type: 'toggleHideMode' });
-    expect(state.rounds.de!.hideMode).toBe(false);
+    expect(de().hideMode).toBe(false);
+    expect(de().hidden).toEqual(['K', 'X']);
+    expect(isLocked(de(), 'X')).toBe(true);
+    expect(isLocked(de(), 'A')).toBe(false);
+    expect(de().input).toBe('K'); // schon getippte Buchstaben bleiben stehen
+
     state = reducer(state, { type: 'tapKey', letter: 'X' });
-    state = reducer(state, { type: 'physicalKey', letter: 'A' });
-    expect(state.rounds.de!.input).toBe('XA');
-    expect(state.rounds.de!.hidden).toEqual(['X']);
-    state = reducer(state, { type: 'toggleHideMode' });
-    expect(state.rounds.de!.hidden).toEqual(['X']);
-    expect(isHideActive(state.rounds.de!)).toBe(true);
+    state = reducer(state, { type: 'physicalKey', letter: 'X' });
+    state = reducer(state, { type: 'physicalKey', letter: 'K' });
+    expect(de().input).toBe('K');
+
+    state = reducer(state, { type: 'tapKey', letter: 'O' });
+    state = reducer(state, { type: 'physicalKey', letter: 'H' });
+    expect(de().input).toBe('KOH');
   });
 
-  it('ein neues Wort leert die Auswahl und schaltet den Schalter aus', () => {
+  it('zurückholen: Schalter wieder an und die Taste nochmals antippen', () => {
+    let state: GameState = stateWith({ de: playedRound('WOLKE', [], { hidden: ['X'] }) });
+    expect(isLocked(state.rounds.de!, 'X')).toBe(true);
+    state = reducer(state, { type: 'toggleHideMode' });
+    expect(isHideActive(state.rounds.de!)).toBe(true);
+    expect(isLocked(state.rounds.de!, 'X')).toBe(false);
+    state = reducer(state, { type: 'tapKey', letter: 'X' });
+    state = reducer(state, { type: 'toggleHideMode' });
+    expect(state.rounds.de!.hidden).toEqual([]);
+    state = reducer(state, { type: 'tapKey', letter: 'X' });
+    expect(state.rounds.de!.input).toBe('X');
+  });
+
+  it('ein neues Wort leert die Schraffur und schaltet den Schalter aus', () => {
     let state: GameState = stateWith({ de: playedRound('WOLKE', ['STERN'], { hideMode: true, hidden: ['A', 'Q'] }) });
     state = reducer(state, { type: 'newRound', seed: 3 });
     expect(state.rounds.de!.hidden).toEqual([]);
     expect(state.rounds.de!.hideMode).toBe(false);
     expect(state.rounds.de!.guesses).toEqual([]);
+    state = reducer(state, { type: 'physicalKey', letter: 'Q' });
+    expect(state.rounds.de!.input).toBe('Q');
+  });
+
+  it('auch nach Sieg oder Niederlage leert das neue Wort die Schraffur', () => {
+    for (const words of [['WOLKE'], ['STERN', 'LAMPE', 'BLUME', 'KOHLE', 'TASSE', 'KASSE', 'ABEND', 'ADLER']]) {
+      let state: GameState = stateWith({ de: playedRound('WOLKE', words, { hidden: ['Q'] }) });
+      expect(state.rounds.de!.status).not.toBe('playing');
+      state = reducer(state, { type: 'newRound', seed: 4 });
+      expect(state.rounds.de!.hidden).toEqual([]);
+      expect(state.rounds.de!.hideMode).toBe(false);
+    }
+  });
+
+  it('jede Sprache behält ihre eigene Schraffur', () => {
+    let state = createInitialState(5);
+    state = reducer(state, { type: 'toggleHideMode' });
+    state = reducer(state, { type: 'tapKey', letter: 'Q' });
+    state = reducer(state, { type: 'toggleHideMode' });
+    state = reducer(state, { type: 'setLang', lang: 'en', seed: 9 });
+    expect(state.rounds.en!.hidden).toEqual([]);
+    state = reducer(state, { type: 'physicalKey', letter: 'Q' });
+    expect(state.rounds.en!.input).toBe('Q');
+    state = reducer(state, { type: 'setLang', lang: 'de', seed: 10 });
+    expect(state.rounds.de!.hidden).toEqual(['Q']);
+    state = reducer(state, { type: 'physicalKey', letter: 'Q' });
+    expect(state.rounds.de!.input).toBe('');
   });
 });
 

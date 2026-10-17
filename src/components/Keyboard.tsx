@@ -26,7 +26,9 @@ export function Keyboard({ round, resultDelayed, onLetter, onEnter, onDelete, on
   const playing = round.status === 'playing';
 
   const renderKey = (letter: string) => {
-    const isHidden = hideActive && hidden.has(letter);
+    // Die Schraffur bleibt auch bei ausgeschaltetem Schalter sichtbar; die Taste ist dann gesperrt.
+    const isHidden = hidden.has(letter);
+    const locked = isHidden && !hideActive;
     const mark = marks[letter] ?? 0;
     const label = isHidden ? `${letter}, ausgeblendet` : mark ? `${letter}, ${MARK_LABELS[mark]}` : letter;
     return (
@@ -38,7 +40,7 @@ export function Keyboard({ round, resultDelayed, onLetter, onEnter, onDelete, on
         data-hidden={isHidden ? '' : undefined}
         aria-pressed={hideActive ? isHidden : undefined}
         aria-label={label}
-        aria-disabled={!playing && !hideActive ? true : undefined}
+        aria-disabled={locked || (!playing && !hideActive) ? true : undefined}
         onClick={() => onLetter(letter)}
       >
         <span className="fill fill--wrong" />
@@ -57,7 +59,7 @@ export function Keyboard({ round, resultDelayed, onLetter, onEnter, onDelete, on
       {placement === 'keyboard' ? (
         <ResultCard round={round} variant="keyboard" delayed={resultDelayed} onNewWord={onNewWord} />
       ) : (
-        <HideSwitch on={round.hideMode} onToggle={onToggleHide} />
+        <HideSwitch on={round.hideMode} hiddenCount={round.hidden.length} onToggle={onToggleHide} />
       )}
       <div className="kb-row">{ROWS[0].map(renderKey)}</div>
       <div className="kb-row kb-row--mid">{ROWS[1].map(renderKey)}</div>

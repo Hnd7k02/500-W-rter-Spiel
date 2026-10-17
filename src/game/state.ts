@@ -76,9 +76,14 @@ export function resultPlacement(round: Round): ResultPlacement {
   return MAX_GUESSES - round.guesses.length >= 2 ? 'board' : 'keyboard';
 }
 
-/** Ausblenden ist wirksam, solange der Schalter an und sichtbar ist. */
+/** Schraffieren per Antippen geht, solange der Schalter an und sichtbar ist. */
 export function isHideActive(round: Round): boolean {
   return round.hideMode && resultPlacement(round) !== 'keyboard';
+}
+
+/** Schraffierte Buchstaben bleiben bei ausgeschaltetem Schalter sichtbar und sind gesperrt. */
+export function isLocked(round: Round, letter: string): boolean {
+  return !isHideActive(round) && round.hidden.includes(letter);
 }
 
 /** Stärkste Markierung pro Buchstabe über alle Zeilen: Richtig vor Im Wort vor Falsch. */
@@ -131,14 +136,15 @@ export function toggleHideMode(round: Round): Round {
   return { ...round, hideMode: !round.hideMode };
 }
 
-/** Bildschirm-Taste: bei Schalter an schraffieren statt schreiben. */
+/** Bildschirm-Taste: bei Schalter an Schraffur ein/aus, sonst schreiben – ausser der Buchstabe ist gesperrt. */
 export function tapKey(round: Round, letter: string): Round {
-  return isHideActive(round) ? toggleHidden(round, letter) : typeLetter(round, letter);
+  if (isHideActive(round)) return toggleHidden(round, letter);
+  return isLocked(round, letter) ? round : typeLetter(round, letter);
 }
 
-/** Physische Taste: im Ausblende-Modus passiert nichts. */
+/** Physische Taste: Im Ausblende-Modus passiert nichts, gesperrte Buchstaben werden ignoriert. */
 export function pressPhysicalKey(round: Round, letter: string): Round {
-  return round.hideMode ? round : typeLetter(round, letter);
+  return round.hideMode || round.hidden.includes(letter) ? round : typeLetter(round, letter);
 }
 
 /** Schreibt die Eingabe fest, wenn sie noch dieselbe ist und noch nicht geraten wurde. */

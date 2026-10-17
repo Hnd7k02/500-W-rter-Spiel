@@ -498,6 +498,15 @@ button:focus-visible {
   transform: scale(0.94);
 }
 
+/* Gesperrte Tasten (schraffiert bei Schalter aus, oder nach Rundenende) reagieren nicht. */
+.key[aria-disabled='true'] {
+  cursor: default;
+}
+
+.key[aria-disabled='true']:active {
+  transform: none;
+}
+
 .key > .fill--wrong {
   box-shadow: var(--wrong-shadow-key);
 }

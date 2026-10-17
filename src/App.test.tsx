@@ -114,27 +114,71 @@ describe('Ausblenden', () => {
     expect(key('A').getAttribute('aria-pressed')).toBe('false');
   });
 
-  it('Schalter aus: alles normal, die Auswahl bleibt erhalten', () => {
+  it('Schalter aus: Schraffur bleibt, gesperrte Tasten schreiben weder per Tippen noch physisch', () => {
     renderWith(stateWith({ de: playedRound('WOLKE', []) }));
+    tap('Q'); // schon getippt
     fireEvent.click(hideSwitch());
-    fireEvent.click(key('Q'));
+    ['Q', 'X', 'A'].forEach((l) => fireEvent.click(key(l)));
     fireEvent.click(hideSwitch());
-    expect(key('Q').getAttribute('aria-pressed')).toBeNull();
-    expect(key('Q').hasAttribute('data-hidden')).toBe(false);
-    expect(screen.getByText('Buchstaben grau schraffieren')).toBeTruthy();
-    fireEvent.click(key('Q'));
+
+    expect(hideSwitch().getAttribute('aria-checked')).toBe('false');
+    expect(keyboard().className).not.toContain('keyboard--hide');
+    expect(screen.getByText('3 Buchstaben ausgeblendet')).toBeTruthy();
+    const q = key('Q');
+    expect(q.hasAttribute('data-hidden')).toBe(true);
+    expect(q.getAttribute('aria-disabled')).toBe('true');
+    expect(q.getAttribute('aria-label')).toBe('Q, ausgeblendet');
+    expect(q.getAttribute('aria-pressed')).toBeNull();
+    // Schon getippte Buchstaben bleiben stehen.
     expect(rowText('Versuch 1, Eingabe: Q')).toBeTruthy();
-    fireEvent.click(hideSwitch());
-    expect(key('Q').getAttribute('aria-pressed')).toBe('true');
+
+    fireEvent.click(key('X'));
+    press('x');
+    press('a');
+    expect(rowText('Versuch 1, Eingabe: Q')).toBeTruthy();
+
+    // Alle anderen Tasten sind normal tippbar.
+    expect(key('W').getAttribute('aria-disabled')).toBeNull();
+    fireEvent.click(key('W'));
+    press('e');
+    expect(rowText('Versuch 1, Eingabe: Q W E')).toBeTruthy();
   });
 
-  it('ein neues Wort leert die Auswahl und schaltet aus', () => {
+  it('zurückholen: Schalter an und nochmals antippen; die Unterzeile zählt mit', () => {
+    renderWith(stateWith({ de: playedRound('WOLKE', [], { hidden: ['Q'] }) }));
+    expect(screen.getByText('1 Buchstabe ausgeblendet')).toBeTruthy();
+    expect(key('Q').getAttribute('aria-disabled')).toBe('true');
+
+    fireEvent.click(hideSwitch());
+    expect(key('Q').getAttribute('aria-disabled')).toBeNull();
+    expect(key('Q').getAttribute('aria-pressed')).toBe('true');
+    fireEvent.click(key('Q'));
+    fireEvent.click(hideSwitch());
+
+    expect(screen.getByText('Buchstaben grau schraffieren')).toBeTruthy();
+    expect(key('Q').hasAttribute('data-hidden')).toBe(false);
+    fireEvent.click(key('Q'));
+    expect(rowText('Versuch 1, Eingabe: Q')).toBeTruthy();
+  });
+
+  it('ein neues Wort leert die Schraffur und schaltet aus', () => {
     renderWith(stateWith({ de: playedRound('WOLKE', [], { hideMode: true, hidden: ['Q', 'X'] }) }));
     expect(key('Q').getAttribute('aria-pressed')).toBe('true');
     fireEvent.click(screen.getByRole('button', { name: 'Neues Wort würfeln' }));
     expect(hideSwitch().getAttribute('aria-checked')).toBe('false');
-    fireEvent.click(hideSwitch());
-    expect(key('Q').getAttribute('aria-pressed')).toBe('false');
+    expect(screen.getByText('Buchstaben grau schraffieren')).toBeTruthy();
+    expect(key('Q').hasAttribute('data-hidden')).toBe(false);
+    expect(key('Q').getAttribute('aria-disabled')).toBeNull();
+    press('q');
+    expect(rowText('Versuch 1, Eingabe: Q')).toBeTruthy();
+    expect(loadState()?.rounds.de?.hidden).toEqual([]);
+  });
+
+  it('nach Sieg leert «Neues Wort» die Schraffur ebenfalls', () => {
+    renderWith(stateWith({ de: playedRound('WOLKE', ['WOLKE'], { hidden: ['Q'] }) }));
+    expect(key('Q').hasAttribute('data-hidden')).toBe(true);
+    fireEvent.click(within(board()).getByRole('button', { name: 'Neues Wort' }));
+    expect(key('Q').hasAttribute('data-hidden')).toBe(false);
     expect(loadState()?.rounds.de?.hidden).toEqual([]);
   });
 });
