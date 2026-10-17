@@ -1,9 +1,15 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 import { App } from './App';
 import { loadState, saveState } from './game/storage';
 import type { GameState } from './game/types';
+import { loadValidWords } from './game/words';
 import { playedRound, stateWith } from './test/fixtures';
+
+// Die Wortlisten einmal vorab laden, damit kein Test vom Timing des ersten Imports abhängt.
+beforeAll(async () => {
+  await Promise.all([loadValidWords('de'), loadValidWords('en')]);
+}, 30_000);
 
 function renderWith(state: GameState) {
   saveState(state);

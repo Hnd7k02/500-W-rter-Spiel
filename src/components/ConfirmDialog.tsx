@@ -9,14 +9,14 @@ interface ConfirmDialogProps {
 /** Dialog im iOS-Stil vor einem neuen Wort, wenn die Runde läuft. */
 export function ConfirmDialog({ open, onCancel, onConfirm }: ConfirmDialogProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
-  const cancelRef = useRef<HTMLButtonElement>(null);
   const onCancelRef = useRef(onCancel);
   onCancelRef.current = onCancel;
 
   useEffect(() => {
     if (!open) return;
     const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    cancelRef.current?.focus();
+    // Fokus auf den Dialog selbst: Screenreader lesen Titel und Text, Tab führt zu den Buttons.
+    dialogRef.current?.focus();
 
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -30,10 +30,11 @@ export function ConfirmDialog({ open, onCancel, onConfirm }: ConfirmDialogProps)
       if (!buttons || buttons.length === 0) return;
       const first = buttons[0];
       const last = buttons[buttons.length - 1];
-      if (e.shiftKey && document.activeElement === first) {
+      const active = document.activeElement;
+      if (e.shiftKey && (active === first || active === dialogRef.current)) {
         e.preventDefault();
         last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
+      } else if (!e.shiftKey && active === last) {
         e.preventDefault();
         first.focus();
       }
@@ -51,6 +52,7 @@ export function ConfirmDialog({ open, onCancel, onConfirm }: ConfirmDialogProps)
     <div className="dialog-backdrop">
       <div
         ref={dialogRef}
+        tabIndex={-1}
         className="dialog"
         role="alertdialog"
         aria-modal="true"
@@ -66,7 +68,7 @@ export function ConfirmDialog({ open, onCancel, onConfirm }: ConfirmDialogProps)
           </p>
         </div>
         <div className="dialog__actions">
-          <button ref={cancelRef} type="button" className="dialog__btn" onClick={onCancel}>
+          <button type="button" className="dialog__btn" onClick={onCancel}>
             Abbrechen
           </button>
           <button type="button" className="dialog__btn dialog__btn--primary" onClick={onConfirm}>

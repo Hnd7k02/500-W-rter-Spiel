@@ -49,6 +49,12 @@ export function Board({ round, popRow, celebrate, shakeSignal, onMark, onNewWord
   const free = MAX_GUESSES - round.guesses.length;
   const activeRow = round.status === 'playing' ? round.guesses.length : -1;
 
+  // Reicht der Platz nicht (Querformat), scrollt das Spielfeld: die aktive Zeile bleibt sichtbar.
+  useEffect(() => {
+    const el = activeTiles.current;
+    if (el && typeof el.scrollIntoView === 'function') el.scrollIntoView({ block: 'nearest' });
+  }, [activeRow]);
+
   return (
     <main className="field" aria-label="Spielfeld">
       <div

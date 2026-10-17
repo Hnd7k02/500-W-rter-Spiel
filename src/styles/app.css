@@ -148,6 +148,12 @@ button:focus-visible {
   white-space: nowrap;
 }
 
+@media (max-width: 359px) {
+  .title {
+    font-size: 17px;
+  }
+}
+
 .dice {
   position: relative;
   justify-self: end;
@@ -388,7 +394,7 @@ button:focus-visible {
   box-shadow: var(--focus-ring);
 }
 
-.tile--typed {
+.tile--pop {
   animation: tile-pop 120ms ease-out;
 }
 
@@ -895,6 +901,10 @@ button:focus-visible {
   animation: dialog-in 240ms var(--ease-out) both;
 }
 
+.dialog:focus {
+  outline: none;
+}
+
 .dialog__body {
   padding: 20px 18px 17px;
 }
@@ -1032,7 +1042,7 @@ button:focus-visible {
 
 /* Bei reduzierter Bewegung nur Überblendungen. */
 @media (prefers-reduced-motion: reduce) {
-  .tile--typed {
+  .tile--pop {
     animation: none;
   }
 

@@ -5,7 +5,8 @@ import { MARK_LABELS, markName } from './marks';
 type TileProps =
   /** Leere Zeile, Rest der Eingabezeile, nächste Stelle (blauer Glow) */
   | { kind: 'empty' | 'rest' | 'cursor' }
-  | { kind: 'typed'; letter: string }
+  /** pop: eben getippt, die Kachel federt kurz */
+  | { kind: 'typed'; letter: string; pop: boolean }
   | {
       kind: 'guess';
       letter: string;
@@ -19,8 +20,9 @@ type TileProps =
 
 export function Tile(props: TileProps) {
   if (props.kind !== 'guess') {
+    const pop = props.kind === 'typed' && props.pop ? ' tile--pop' : '';
     return (
-      <div className={`tile tile--${props.kind}`} aria-hidden="true">
+      <div className={`tile tile--${props.kind}${pop}`} aria-hidden="true">
         {props.kind === 'typed' && <span className="tile__ch">{props.letter}</span>}
       </div>
     );
