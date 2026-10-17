@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { playedRound, withMarks } from '../test/fixtures';
-import { createInitialState, ensureActiveRound, reducer } from './state';
+import { commitGuess, createInitialState, ensureActiveRound, reducer } from './state';
 import { loadState, parseState, saveState, STORAGE_KEY } from './storage';
 import type { GameState } from './types';
 
@@ -32,6 +32,43 @@ describe('Speichern und Laden', () => {
     };
     saveState(state);
     expect(loadState()).toEqual(state);
+  });
+
+  it('speichert Hinweise der aktuellen Zeile und der gewerteten Zeilen', () => {
+    let de = commitGuess({ ...playedRound('WOLKE', []), hints: [1], input: 'KHLE' }, 'KOHLE');
+    de = { ...de, hints: [0, 4], input: 'AB' };
+    const state: GameState = { lang: 'de', rounds: { de }, bags: { de: [], en: [] } };
+    saveState(state);
+    const loaded = loadState()!;
+    expect(loaded).toEqual(state);
+    expect(loaded.rounds.de!.hints).toEqual([0, 4]);
+    expect(loaded.rounds.de!.guesses[0].hints).toEqual([1]);
+  });
+
+  it('ältere Spielstände ohne Hinweise laden weiter', () => {
+    const old = {
+      lang: 'de',
+      rounds: {
+        de: {
+          solution: 'WOLKE',
+          guesses: [{ word: 'STERN', score: [0, 1, 4], marks: [1, 0, 2, 0, 0] }],
+          input: 'KO',
+          hidden: [],
+          hideMode: false,
+          status: 'playing',
+        },
+      },
+      bags: { de: [], en: [] },
+    };
+    const parsed = parseState(old)!;
+    expect(parsed.rounds.de!.hints).toEqual([]);
+    expect(parsed.rounds.de!.guesses[0].hints).toEqual([]);
+    expect(parsed.rounds.de!.input).toBe('KO');
+  });
+
+  it('verwirft eine Eingabe, die mit den Hinweisen nicht zusammenpasst', () => {
+    const bad = { lang: 'de', rounds: { de: { ...playedRound('WOLKE', []), hints: [0, 1], input: 'ABCD' } }, bags: {} };
+    expect(parseState(bad)!.rounds.de).toBeUndefined();
   });
 
   it('liegt unter dem versionierten Schlüssel 500w:v1', () => {

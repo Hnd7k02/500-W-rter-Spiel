@@ -1,4 +1,4 @@
-import { drawWord, seededRandom } from './bag';
+import { drawWord, seededRandom, type Random } from './bag';
 import { score } from './score';
 import { SOLUTIONS } from './words';
 import {
@@ -23,12 +23,19 @@ export type Action =
   | { type: 'mark'; row: number; col: number }
   | { type: 'toggleHideMode' }
   | { type: 'newRound'; seed: number }
-  | { type: 'setLang'; lang: Lang; seed: number };
+  | { type: 'setLang'; lang: Lang; seed: number }
+  /** Zweiter Tipp auf «?»: ein grüner Buchstabe für die aktuelle Zeile */
+  | { type: 'hint'; seed: number }
+  /** Radierer: alle eigenen Markierungen entfernen */
+  | { type: 'clearMarks' }
+  /** «Rückgängig» nach dem Radierer, nur für dieselbe Runde */
+  | { type: 'restoreMarks'; lang: Lang; solution: string; marks: Mark[][] };
 
 const LETTER = /^[A-Z]$/;
+const COLS = Array.from({ length: WORD_LENGTH }, (_, i) => i);
 
 export function createRound(solution: string): Round {
-  return { solution, guesses: [], input: '', hidden: [], hideMode: false, status: 'playing' };
+  return { solution, guesses: [], input: '', hints: [], hidden: [], hideMode: false, status: 'playing' };
 }
 
 /** Zieht ein neues Lösungswort aus dem Stapel der Sprache und startet damit eine frische Runde. */
@@ -58,9 +65,34 @@ export function activeRound(state: GameState): Round {
   return round;
 }
 
-/** Läuft die Runde? (mindestens ein Versuch oder eine angefangene Eingabe) */
+/** Läuft die Runde? (mindestens ein Versuch oder eine angefangene Eingabe, auch ein Hinweis) */
 export function isRoundInProgress(round: Round): boolean {
-  return round.status === 'playing' && (round.guesses.length > 0 || round.input.length > 0);
+  return (
+    round.status === 'playing' && (round.guesses.length > 0 || round.input.length > 0 || round.hints.length > 0)
+  );
+}
+
+export interface Slot {
+  /** Buchstabe oder '' für einen leeren Platz */
+  letter: string;
+  hint: boolean;
+}
+
+/** Die fünf Plätze der aktuellen Zeile: Hinweise an ihrem Platz, getippte Buchstaben füllen die übrigen von links. */
+export function currentSlots(round: Round): Slot[] {
+  let typed = 0;
+  return COLS.map((col) =>
+    round.hints.includes(col)
+      ? { letter: round.solution[col], hint: true }
+      : { letter: round.input[typed++] ?? '', hint: false },
+  );
+}
+
+/** Wort der aktuellen Zeile. Leere Plätze fehlen, das Wort ist dann kürzer als 5. */
+export function currentWord(round: Round): string {
+  return currentSlots(round)
+    .map((slot) => slot.letter)
+    .join('');
 }
 
 export function isWinningRow(round: Round, row: number): boolean {
@@ -92,12 +124,73 @@ export function keyMarks(round: Round): Record<string, Mark> {
   round.guesses.forEach((guess, row) => {
     const win = isWinningRow(round, row);
     for (let i = 0; i < WORD_LENGTH; i++) {
-      const mark: Mark = win ? 3 : guess.marks[i];
+      const mark: Mark = win || guess.hints.includes(i) ? 3 : guess.marks[i];
       const letter = guess.word[i];
       if (mark > (best[letter] ?? 0)) best[letter] = mark;
     }
   });
+  // Hinweis-Buchstaben der aktuellen Zeile sind sicher richtig.
+  for (const col of round.hints) best[round.solution[col]] = 3;
   return best;
+}
+
+/** Gibt es eigene Markierungen? Gewinnzeile und Hinweise zählen nicht. */
+export function hasOwnMarks(round: Round): boolean {
+  return round.guesses.some(
+    (guess, row) => !isWinningRow(round, row) && guess.marks.some((mark, col) => mark !== 0 && !guess.hints.includes(col)),
+  );
+}
+
+/** Radierer: entfernt alle eigenen Markierungen. Gewinnzeile, Hinweise und Schraffur bleiben. */
+export function clearMarks(round: Round): Round {
+  if (!hasOwnMarks(round)) return round;
+  const guesses = round.guesses.map((guess, row) =>
+    isWinningRow(round, row) ? guess : { ...guess, marks: COLS.map((col): Mark => (guess.hints.includes(col) ? 3 : 0)) },
+  );
+  return { ...round, guesses };
+}
+
+/** Stellt Markierungen aus einer Momentaufnahme wieder her («Rückgängig»). */
+export function restoreMarks(round: Round, snapshot: Mark[][]): Round {
+  const guesses = round.guesses.map((guess, row) => {
+    const saved = snapshot[row];
+    if (!saved || isWinningRow(round, row)) return guess;
+    return { ...guess, marks: COLS.map((col): Mark => (guess.hints.includes(col) ? 3 : (saved[col] ?? guess.marks[col]))) };
+  });
+  return { ...round, guesses };
+}
+
+/** Kann «?» noch helfen? Nicht nach Rundenende und nicht, wenn alle Plätze schon Hinweise sind. */
+export function canHint(round: Round): boolean {
+  return round.status === 'playing' && round.hints.length < WORD_LENGTH;
+}
+
+/**
+ * Hinweis: Ein zufälliger Platz ohne Hinweis bekommt den richtigen Buchstaben, bevorzugt ein leerer.
+ * Sind alle belegt, ersetzt der Hinweis einen getippten Buchstaben. Ist der Buchstabe schraffiert,
+ * wird die Schraffur dafür aufgehoben.
+ */
+export function giveHint(round: Round, random: Random): Round {
+  if (!canHint(round)) return round;
+  const open = COLS.filter((col) => !round.hints.includes(col));
+  // Getippte Buchstaben belegen die offenen Plätze von links, der Rest ist leer.
+  const empty = open.slice(round.input.length);
+  let input = round.input;
+  let col: number;
+  if (empty.length > 0) {
+    col = empty[Math.floor(random() * empty.length)];
+  } else {
+    const index = Math.floor(random() * open.length);
+    col = open[index];
+    input = input.slice(0, index) + input.slice(index + 1);
+  }
+  const letter = round.solution[col];
+  return {
+    ...round,
+    input,
+    hints: [...round.hints, col].sort((a, b) => a - b),
+    hidden: round.hidden.filter((l) => l !== letter),
+  };
 }
 
 export type GuessCheck = 'ok' | 'short' | 'repeat' | 'unknown';
@@ -113,11 +206,14 @@ export function checkGuess(round: Round, word: string, valid?: ReadonlySet<strin
   return 'ok';
 }
 
+/** Tippen füllt den ersten freien Platz von links und überspringt Hinweis-Plätze. */
 export function typeLetter(round: Round, letter: string): Round {
-  if (round.status !== 'playing' || round.input.length >= WORD_LENGTH || !LETTER.test(letter)) return round;
+  if (round.status !== 'playing' || !LETTER.test(letter)) return round;
+  if (round.input.length >= WORD_LENGTH - round.hints.length) return round;
   return { ...round, input: round.input + letter };
 }
 
+/** Löschen entfernt den rechtesten getippten Buchstaben, nie einen Hinweis. */
 export function deleteLetter(round: Round): Round {
   if (round.status !== 'playing' || round.input.length === 0) return round;
   return { ...round, input: round.input.slice(0, -1) };
@@ -147,11 +243,11 @@ export function pressPhysicalKey(round: Round, letter: string): Round {
   return round.hideMode || round.hidden.includes(letter) ? round : typeLetter(round, letter);
 }
 
-/** Schreibt die Eingabe fest, wenn sie noch dieselbe ist und noch nicht geraten wurde. */
+/** Schreibt die Zeile fest, wenn sie noch dieselbe ist und noch nicht geraten wurde. Hinweise zählen normal mit. */
 export function commitGuess(round: Round, word: string): Round {
   if (
     round.status !== 'playing' ||
-    round.input !== word ||
+    currentWord(round) !== word ||
     checkGuess(round, word) !== 'ok' ||
     round.guesses.length >= MAX_GUESSES
   ) {
@@ -159,16 +255,18 @@ export function commitGuess(round: Round, word: string): Round {
   }
   const result = score(word, round.solution);
   const won = result[0] === WORD_LENGTH;
-  const guess: Guess = { word, score: result, marks: won ? [3, 3, 3, 3, 3] : [0, 0, 0, 0, 0] };
+  const hints = [...round.hints];
+  const marks = COLS.map((col): Mark => (won || hints.includes(col) ? 3 : 0));
+  const guess: Guess = { word, score: result, marks, hints };
   const guesses = [...round.guesses, guess];
   const status = won ? 'won' : guesses.length >= MAX_GUESSES ? 'lost' : 'playing';
-  return { ...round, guesses, input: '', status };
+  return { ...round, guesses, input: '', hints: [], status };
 }
 
-/** Markier-Zyklus einer Kachel: ohne → Falsch → Im Wort → Richtig → ohne. Die Gewinnzeile bleibt grün. */
+/** Markier-Zyklus einer Kachel: ohne → Falsch → Im Wort → Richtig → ohne. Gewinnzeile und Hinweise bleiben grün. */
 export function cycleMark(round: Round, row: number, col: number): Round {
   const guess = round.guesses[row];
-  if (!guess || col < 0 || col >= WORD_LENGTH || isWinningRow(round, row)) return round;
+  if (!guess || col < 0 || col >= WORD_LENGTH || isWinningRow(round, row) || guess.hints.includes(col)) return round;
   const marks = [...guess.marks];
   marks[col] = ((marks[col] + 1) % 4) as Mark;
   const guesses = round.guesses.map((g, i) => (i === row ? { ...g, marks } : g));
@@ -202,5 +300,11 @@ export function reducer(state: GameState, action: Action): GameState {
       return updateRound(state, state.lang, (r) => cycleMark(r, action.row, action.col));
     case 'toggleHideMode':
       return updateRound(state, state.lang, toggleHideMode);
+    case 'hint':
+      return updateRound(state, state.lang, (r) => giveHint(r, seededRandom(action.seed)));
+    case 'clearMarks':
+      return updateRound(state, state.lang, clearMarks);
+    case 'restoreMarks':
+      return updateRound(state, action.lang, (r) => (r.solution === action.solution ? restoreMarks(r, action.marks) : r));
   }
 }

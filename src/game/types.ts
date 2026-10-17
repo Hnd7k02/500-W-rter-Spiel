@@ -18,13 +18,20 @@ export interface Guess {
   score: Score;
   /** Eine Markierung pro Kachel, nur Notiz – ändert die Wertung nie. */
   marks: Mark[];
+  /** Plätze, die per Hinweis gefüllt wurden: bleiben grün und gesperrt. */
+  hints: number[];
 }
 
 export interface Round {
   solution: string;
   guesses: Guess[];
-  /** Aktuelle Eingabe, höchstens 5 Buchstaben. */
+  /**
+   * Getippte Buchstaben der aktuellen Zeile in Reihenfolge. Sie belegen die Plätze ohne Hinweis
+   * von links, darum höchstens 5 minus Anzahl Hinweise.
+   */
   input: string;
+  /** Hinweis-Plätze (0–4) der aktuellen Zeile, sortiert. Dort steht der richtige Buchstabe der Lösung. */
+  hints: number[];
   /** Ausgeblendete (grau schraffierte) Buchstaben, sortiert. */
   hidden: string[];
   /** Schalter «Ausblenden». */

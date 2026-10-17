@@ -40,7 +40,7 @@ describe('Eingabe und Prüfen', () => {
 
   it('schreibt fest, wertet und leert die Eingabe', () => {
     const r = commitGuess(type(playedRound('WOLKE', []), 'KOHLE'), 'KOHLE');
-    expect(r.guesses).toEqual([{ word: 'KOHLE', score: [2, 2, 1], marks: [0, 0, 0, 0, 0] }]);
+    expect(r.guesses).toEqual([{ word: 'KOHLE', score: [2, 2, 1], marks: [0, 0, 0, 0, 0], hints: [] }]);
     expect(r.input).toBe('');
     expect(r.status).toBe('playing');
   });

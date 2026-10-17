@@ -23,6 +23,15 @@ const isObj = (v: unknown): v is Obj => typeof v === 'object' && v !== null && !
 const isMark = (v: unknown): v is Mark => v === 0 || v === 1 || v === 2 || v === 3;
 const isCount = (v: unknown): v is number => Number.isInteger(v) && (v as number) >= 0 && (v as number) <= WORD_LENGTH;
 
+/** Hinweis-Plätze: fehlen sie (ältere Spielstände), gibt es keine. */
+function parseHints(v: unknown): number[] | null {
+  if (v === undefined) return [];
+  if (!Array.isArray(v)) return null;
+  if (!v.every((col) => Number.isInteger(col) && col >= 0 && col < WORD_LENGTH)) return null;
+  const hints = [...new Set(v as number[])].sort((a, b) => a - b);
+  return hints.length === v.length ? hints : null;
+}
+
 function parseGuess(v: unknown): Guess | null {
   if (!isObj(v)) return null;
   const { word, score, marks } = v;
@@ -30,7 +39,10 @@ function parseGuess(v: unknown): Guess | null {
   if (!Array.isArray(score) || score.length !== 3 || !score.every(isCount)) return null;
   if (score[0] + score[1] + score[2] !== WORD_LENGTH) return null;
   if (!Array.isArray(marks) || marks.length !== WORD_LENGTH || !marks.every(isMark)) return null;
-  return { word, score: [score[0], score[1], score[2]], marks: [...marks] };
+  const hints = parseHints(v.hints);
+  if (!hints) return null;
+  // Hinweis-Plätze sind immer grün.
+  return { word, score: [score[0], score[1], score[2]], marks: marks.map((m, col) => (hints.includes(col) ? 3 : m)), hints };
 }
 
 function parseRound(v: unknown): Round | null {
@@ -40,7 +52,9 @@ function parseRound(v: unknown): Round | null {
   if (!Array.isArray(guesses) || guesses.length > MAX_GUESSES) return null;
   const parsed = guesses.map(parseGuess);
   if (parsed.some((g) => g === null)) return null;
-  if (typeof input !== 'string' || !/^[A-Z]{0,5}$/.test(input)) return null;
+  const hints = parseHints(v.hints);
+  if (!hints) return null;
+  if (typeof input !== 'string' || !/^[A-Z]*$/.test(input) || input.length > WORD_LENGTH - hints.length) return null;
   if (!Array.isArray(hidden) || !hidden.every((l) => typeof l === 'string' && LETTER.test(l))) return null;
   if (typeof hideMode !== 'boolean') return null;
   if (typeof status !== 'string' || !STATUSES.includes(status as Status)) return null;
@@ -48,6 +62,7 @@ function parseRound(v: unknown): Round | null {
     solution,
     guesses: parsed as Guess[],
     input,
+    hints,
     hidden: [...new Set(hidden as string[])].sort(),
     hideMode,
     status: status as Status,
