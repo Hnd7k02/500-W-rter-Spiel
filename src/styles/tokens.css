@@ -1,0 +1,119 @@
+:root {
+  /* Schrift */
+  --font: 'Plus Jakarta Sans Variable', system-ui, -apple-system, sans-serif;
+
+  /* Flächen und Text */
+  --bg: #F1F2F6;
+  --bg-glow: radial-gradient(140% 60% at 50% -12%, #FFFFFF 0%, rgba(255, 255, 255, 0) 62%);
+  --card: #FFFFFF;
+  --card-shadow: 0 18px 40px -14px rgba(16, 24, 40, 0.20), 0 2px 6px rgba(16, 24, 40, 0.05);
+  --toast-shadow: 0 24px 48px -16px rgba(16, 24, 40, 0.28), 0 2px 8px rgba(16, 24, 40, 0.06);
+  --ink: #1D1D1F;
+  --ink-soft: #6E6E73;
+  --ink-mute: #767B86;
+
+  /* Farbstufen: Richtig (laut, glänzend) > Im Wort (glänzend) > Falsch (leise, getönt) */
+  --right-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.30), rgba(255, 255, 255, 0) 52%), linear-gradient(180deg, #36C670, #128A47);
+  --right-ink: #FFFFFF;
+  --right-text-shadow: 0 1px 1px rgba(0, 60, 25, 0.3);
+  --right-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 8px 18px -6px rgba(18, 138, 71, 0.6);
+  --right-shadow-key: inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 5px 12px -5px rgba(18, 138, 71, 0.65);
+  --right-shadow-chip: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 4px 10px -3px rgba(18, 138, 71, 0.55);
+  --maybe-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.40), rgba(255, 255, 255, 0) 52%), linear-gradient(180deg, #FFD45E, #FFAD1F);
+  --maybe-ink: #5A3B00;
+  --maybe-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 8px 18px -6px rgba(255, 165, 20, 0.6);
+  --maybe-shadow-key: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 5px 12px -5px rgba(255, 165, 20, 0.65);
+  --maybe-shadow-chip: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 4px 10px -3px rgba(255, 165, 20, 0.55);
+  --wrong-bg: linear-gradient(180deg, #FFF4F3, #FFE6E4);
+  --wrong-ink: #CC3540;
+  --wrong-shadow: inset 0 0 0 1px rgba(204, 53, 64, 0.10), 0 1px 2px rgba(16, 24, 40, 0.04);
+  --wrong-shadow-key: inset 0 0 0 1px rgba(204, 53, 64, 0.10);
+  --wrong-shadow-chip: inset 0 0 0 1px rgba(204, 53, 64, 0.16);
+
+  /* Kacheln und Eingabezeile */
+  --tile-bg: linear-gradient(180deg, #FFFFFF, #FAFBFC);
+  --tile-shadow: 0 1px 2px rgba(16, 24, 40, 0.06), 0 6px 14px -4px rgba(16, 24, 40, 0.10);
+  --slot-bg: rgba(120, 128, 150, 0.08);
+  --slot-shadow: inset 0 1px 2px rgba(16, 24, 40, 0.04);
+  --input-rest-bg: rgba(255, 255, 255, 0.7);
+  --input-rest-shadow: inset 0 0 0 1px rgba(16, 24, 40, 0.06);
+  --focus-ring: 0 0 0 2px #0A84FF, 0 0 0 6px rgba(10, 132, 255, 0.12), 0 8px 20px -6px rgba(10, 132, 255, 0.5);
+
+  /* Zahlen-Chips */
+  --chip-zero-bg: rgba(120, 128, 150, 0.10);
+  --chip-zero-ink: #767B86;
+  --chip-empty-bg: rgba(120, 128, 150, 0.05);
+
+  /* Tastatur */
+  --key-bg: #F0F1F5;
+  --key-shadow: inset 0 -1px 0 rgba(16, 24, 40, 0.07);
+  --key-special-bg: #E3E5EB;
+  --key-hidden-bg: repeating-linear-gradient(135deg, #D3D7DF 0 2px, #F0F1F5 2px 6px);
+  --key-hidden-ink: rgba(60, 60, 67, 0.3);
+  --action-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 52%), linear-gradient(180deg, #2A86F5, #0059D6);
+  --action-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 6px 14px -5px rgba(0, 89, 214, 0.6);
+  --hide-glow: 0 0 0 2px rgba(10, 132, 255, 0.55), 0 0 28px 2px rgba(10, 132, 255, 0.26);
+  --hide-hint-ink: #0A6FE0;
+  --switch-off: #E9E9EB;
+  --switch-on-glow: 0 0 0 4px rgba(10, 132, 255, 0.14), 0 4px 14px rgba(10, 132, 255, 0.45);
+  --segment-track: rgba(118, 118, 128, 0.12);
+  --segment-off-ink: #636366;
+  --dice-glow: 0 0 0 4px rgba(10, 132, 255, 0.14), 0 0 24px rgba(10, 132, 255, 0.45);
+
+  /* Icons über den Zahlen-Spalten */
+  --icon-right: #18994F;
+  --icon-maybe: #E39A00;
+  --icon-wrong: #CC3540;
+
+  /* Radien */
+  --r-tile: 14px;
+  --r-key: 10px;
+  --r-card: 28px;
+
+  /* ---- Ergänzt: Werte aus den Referenzbildern, die oben fehlen ---- */
+
+  /* Eingabezeile: nächste Stelle */
+  --cursor-bg: #FFFFFF;
+
+  /* Kopfzeile */
+  --segment-on-bg: #FFFFFF;
+  --segment-on-shadow: 0 3px 8px rgba(0, 0, 0, 0.12), 0 3px 1px rgba(0, 0, 0, 0.04);
+  --dice-bg: linear-gradient(180deg, #FFFFFF, #F5F6F9);
+  --dice-shadow: 0 8px 20px -6px rgba(16, 24, 40, 0.18), 0 1px 2px rgba(16, 24, 40, 0.06);
+
+  /* Tastatur */
+  --key-special-shadow: inset 0 -1px 0 rgba(16, 24, 40, 0.08);
+  --key-hidden-shadow: inset 0 0 0 1px rgba(16, 24, 40, 0.05);
+  --key-pressed-filter: brightness(0.94);
+  --switch-off-shadow: inset 0 0 0 1px rgba(16, 24, 40, 0.04);
+  --switch-knob: #FFFFFF;
+  --switch-knob-shadow: 0 3px 8px rgba(0, 0, 0, 0.15), 0 3px 1px rgba(0, 0, 0, 0.06);
+  --hide-icon-bg: repeating-linear-gradient(135deg, #C9CDD6 0 2px, #F0F1F5 2px 5px);
+  --hide-icon-bg-on: repeating-linear-gradient(135deg, #8CBDF8 0 2px, #E8F2FF 2px 5px);
+  --hide-icon-shadow: inset 0 0 0 1px rgba(16, 24, 40, 0.06);
+
+  /* Ergebnis-Karte */
+  --r-result: 24px;
+  --result-icon-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 8px 18px -6px rgba(18, 138, 71, 0.65);
+  --lost-bg: linear-gradient(180deg, #F7F8FA, #E6E8EE);
+  --lost-ink: #5E626C;
+  --lost-shadow: inset 0 0 0 1px rgba(16, 24, 40, 0.06), 0 6px 14px -6px rgba(16, 24, 40, 0.22);
+
+  /* Meldungen */
+  --r-toast: 22px;
+
+  /* Dialog im iOS-Stil */
+  --dialog-bg: rgba(255, 255, 255, 0.94);
+  --dialog-backdrop: rgba(16, 24, 40, 0.32);
+  --dialog-separator: rgba(60, 60, 67, 0.16);
+  --dialog-ink: #0A6FE0;
+  --dialog-pressed: rgba(120, 128, 150, 0.12);
+  --r-dialog: 20px;
+
+  /* Tastatur-Fokus für Bedienung ohne Maus */
+  --focus-outline: #0A84FF;
+
+  /* Bewegung */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}

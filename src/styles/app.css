@@ -1,0 +1,1023 @@
+/* ---------- Grundlagen ---------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+  background: var(--bg);
+  color-scheme: light;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  overscroll-behavior: none;
+  touch-action: manipulation;
+}
+
+body {
+  margin: 0;
+  height: 100%;
+  /* Im Querformat liegt die Notch seitlich: der Rand gehört dem Body, nicht der App-Spalte. */
+  padding: 0 env(safe-area-inset-right) 0 env(safe-area-inset-left);
+  overflow: hidden;
+  overscroll-behavior: none;
+  font-family: var(--font);
+  color: var(--ink);
+  background: var(--bg-glow) no-repeat, var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#root {
+  height: 100%;
+}
+
+button {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font: inherit;
+  color: inherit;
+  background: none;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus {
+  outline: none;
+}
+
+button:focus-visible {
+  outline: 2px solid var(--focus-outline);
+  outline-offset: 2px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- App-Spalte ---------- */
+
+.app {
+  --key-h: 46px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 430px;
+  height: 100vh;
+  height: 100dvh;
+  margin: 0 auto;
+  padding: calc(env(safe-area-inset-top) + 8px) 14px max(env(safe-area-inset-bottom), 14px);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/*
+ * Wird der Platz knapp, schrumpfen zuerst die Kacheln (bis 30 px, siehe .board).
+ * Erst wenn das Spielfeld selbst mit 30-px-Kacheln nicht mehr passt (313 px), sinken die Tasten
+ * bis auf 40 px. 483 px = Spielfeld 313 + Kopfzeile, Abstände und Tastatur ohne Tasten 170.
+ */
+@supports (height: 100dvh) {
+  .app {
+    --key-h: clamp(
+      40px,
+      (100dvh - env(safe-area-inset-top) - max(env(safe-area-inset-bottom), 14px) - 483px) / 3,
+      46px
+    );
+  }
+}
+
+/* ---------- Kopfzeile ---------- */
+
+.header {
+  flex: none;
+  height: 44px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+}
+
+.segment {
+  justify-self: start;
+  display: flex;
+  padding: 2px;
+  border-radius: 12px;
+  background: var(--segment-track);
+}
+
+.segment__btn {
+  width: 46px;
+  height: 34px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  color: var(--segment-off-ink);
+  transition:
+    background-color 200ms ease,
+    box-shadow 200ms ease,
+    color 200ms ease;
+}
+
+.segment__btn[aria-pressed='true'] {
+  color: var(--ink);
+  background-color: var(--segment-on-bg);
+  box-shadow: var(--segment-on-shadow);
+}
+
+.title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.dice {
+  position: relative;
+  justify-self: end;
+  width: 44px;
+  height: 44px;
+  border-radius: 22px;
+  display: grid;
+  place-items: center;
+  color: var(--ink);
+  background: var(--dice-bg);
+  box-shadow: var(--dice-shadow);
+}
+
+.dice::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: var(--dice-glow);
+  opacity: 0;
+  transition: opacity 300ms ease;
+  pointer-events: none;
+}
+
+.dice--glow::after {
+  opacity: 1;
+}
+
+.dice:active,
+.segment__btn:active {
+  filter: var(--key-pressed-filter);
+}
+
+/* ---------- Spielfeld ---------- */
+
+.field {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  container-type: size;
+  /* Erst wenn gar nichts mehr hilft (Querformat, Safari-Leisten), scrollt nur das Spielfeld. */
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+
+.field::-webkit-scrollbar {
+  display: none;
+}
+
+.board {
+  --tile: 46px;
+  position: relative;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+@supports (container-type: size) {
+  .board {
+    --tile: clamp(30px, min((100cqw - 124px) / 5, (100cqh - 73px) / 8), 50px);
+  }
+}
+
+.board__icons {
+  height: 16px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.board__icon {
+  width: 26px;
+  display: flex;
+  justify-content: center;
+}
+
+.board__icon--right {
+  color: var(--icon-right);
+}
+
+.board__icon--maybe {
+  color: var(--icon-maybe);
+}
+
+.board__icon--wrong {
+  color: var(--icon-wrong);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition:
+    opacity 260ms ease,
+    visibility 260ms;
+}
+
+.row--gone {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.chips {
+  display: flex;
+  gap: 4px;
+}
+
+.chip {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 13px;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  background: var(--chip-empty-bg);
+}
+
+.chip--zero {
+  color: var(--chip-zero-ink);
+  background: var(--chip-zero-bg);
+}
+
+.chip--right {
+  color: var(--right-ink);
+  background: var(--right-bg);
+  box-shadow: var(--right-shadow-chip);
+}
+
+.chip--maybe {
+  color: var(--maybe-ink);
+  background: var(--maybe-bg);
+  box-shadow: var(--maybe-shadow-chip);
+}
+
+.chip--wrong {
+  color: var(--wrong-ink);
+  background: var(--wrong-bg);
+  box-shadow: var(--wrong-shadow-chip);
+}
+
+.chip--pop {
+  animation: chip-pop 300ms var(--ease-spring) both;
+  animation-delay: calc(var(--i, 0) * 60ms);
+}
+
+.tiles {
+  display: flex;
+  gap: 6px;
+}
+
+/* ---------- Kacheln und Tasten: gemeinsame Farbebenen ---------- */
+
+/*
+ * Verläufe lassen sich nicht überblenden. Darum liegt jede Markierungsfarbe als eigene Ebene
+ * in der Kachel bzw. Taste; gewechselt wird nur deren Deckkraft (140 ms).
+ */
+.fill {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 140ms ease;
+}
+
+.fill--wrong {
+  background: var(--wrong-bg);
+  box-shadow: var(--wrong-shadow);
+}
+
+.fill--maybe {
+  background: var(--maybe-bg);
+  box-shadow: var(--maybe-shadow);
+}
+
+.fill--right {
+  background: var(--right-bg);
+  box-shadow: var(--right-shadow);
+}
+
+.fill--hidden {
+  background: var(--key-hidden-bg);
+  box-shadow: var(--key-hidden-shadow);
+}
+
+[data-mark='wrong'] > .fill--wrong,
+[data-mark='maybe'] > .fill--maybe,
+[data-mark='right'] > .fill--right,
+[data-hidden] > .fill--hidden {
+  opacity: 1;
+}
+
+.tile {
+  position: relative;
+  flex: none;
+  width: var(--tile);
+  height: var(--tile);
+  border-radius: var(--r-tile);
+  display: grid;
+  place-items: center;
+  font-size: calc(var(--tile) / 2);
+  font-weight: 800;
+  line-height: 1;
+  color: var(--ink);
+  background: var(--tile-bg);
+  box-shadow: var(--tile-shadow);
+  transition:
+    color 140ms ease,
+    text-shadow 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.tile__ch,
+.key__ch {
+  position: relative;
+}
+
+.tile--empty {
+  background: var(--slot-bg);
+  box-shadow: var(--slot-shadow);
+}
+
+.tile--rest {
+  background: var(--input-rest-bg);
+  box-shadow: var(--input-rest-shadow);
+}
+
+.tile--cursor {
+  background: var(--cursor-bg);
+  box-shadow: var(--focus-ring);
+}
+
+.tile--typed {
+  animation: tile-pop 120ms ease-out;
+}
+
+.tile[data-mark='wrong'],
+.tile[data-mark='maybe'],
+.tile[data-mark='right'] {
+  box-shadow: none;
+}
+
+.tile[data-mark='wrong'] {
+  color: var(--wrong-ink);
+}
+
+.tile[data-mark='maybe'] {
+  color: var(--maybe-ink);
+}
+
+.tile[data-mark='right'] {
+  color: var(--right-ink);
+  text-shadow: var(--right-text-shadow);
+}
+
+.tile--win {
+  cursor: default;
+}
+
+/* Sieg: Die Gewinnzeile färbt sich nacheinander grün. */
+.tile--celebrate {
+  animation: tile-celebrate 260ms ease both;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+
+.tile--celebrate > .fill--right {
+  animation: fill-in 260ms var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+
+/* ---------- Tastatur-Karte ---------- */
+
+.keyboard {
+  position: relative;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 8px 10px;
+  border-radius: var(--r-card);
+  background: var(--card);
+  box-shadow: var(--card-shadow);
+  container-type: inline-size;
+}
+
+/* Blauer Glow-Rand im Ausblende-Modus, als eigene Ebene, damit er weich einblendet. */
+.keyboard::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: var(--hide-glow);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease;
+}
+
+.keyboard--hide::after {
+  opacity: 1;
+}
+
+.kb-row {
+  display: flex;
+  gap: 6px;
+}
+
+/* Zweite Reihe beidseitig um eine halbe Tastenbreite (plus halben Abstand) eingerückt. */
+.kb-row--mid {
+  padding: 0 17px;
+  padding-inline: calc((100cqw + 6px) / 20);
+}
+
+.key {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  height: var(--key-h);
+  border-radius: var(--r-key);
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--ink);
+  background: var(--key-bg);
+  box-shadow: var(--key-shadow);
+  transition:
+    color 140ms ease,
+    box-shadow 140ms ease,
+    transform 90ms ease;
+}
+
+.key:active {
+  transform: scale(0.94);
+}
+
+.key > .fill--wrong {
+  box-shadow: var(--wrong-shadow-key);
+}
+
+.key > .fill--maybe {
+  box-shadow: var(--maybe-shadow-key);
+}
+
+.key > .fill--right {
+  box-shadow: var(--right-shadow-key);
+}
+
+.key[data-mark='wrong'],
+.key[data-mark='maybe'],
+.key[data-mark='right'],
+.key[data-hidden] {
+  box-shadow: none;
+}
+
+.key[data-mark='wrong'] {
+  color: var(--wrong-ink);
+}
+
+.key[data-mark='maybe'] {
+  color: var(--maybe-ink);
+}
+
+.key[data-mark='right'] {
+  color: var(--right-ink);
+}
+
+/* Die Schraffur überdeckt die Markierungsfarbe. */
+.key[data-hidden] {
+  color: var(--key-hidden-ink);
+}
+
+.key[data-hidden] > .fill:not(.fill--hidden) {
+  opacity: 0;
+}
+
+.key--wide {
+  flex-grow: 1.55;
+}
+
+.key--action {
+  color: #FFFFFF;
+  background: var(--action-bg);
+  box-shadow: var(--action-shadow);
+}
+
+.key--delete {
+  background: var(--key-special-bg);
+  box-shadow: var(--key-special-shadow);
+}
+
+/* Ausblenden-Reihe */
+
+.hide-row {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 4px 0 6px;
+}
+
+.hide-row__label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.hide-row__icon {
+  position: relative;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  overflow: hidden;
+  background: var(--hide-icon-bg);
+  box-shadow: var(--hide-icon-shadow);
+}
+
+.hide-row__icon::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--hide-icon-bg-on);
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+
+.hide-row--on .hide-row__icon::after {
+  opacity: 1;
+}
+
+.hide-row__text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  line-height: 1.2;
+}
+
+.hide-row__title {
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.hide-row__hint {
+  overflow: hidden;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--ink-soft);
+  transition: color 200ms ease;
+}
+
+.hide-row--on .hide-row__hint {
+  color: var(--hide-hint-ink);
+}
+
+/* iOS-Schalter */
+
+.switch {
+  position: relative;
+  flex: none;
+  width: 51px;
+  height: 31px;
+  border-radius: 16px;
+  background: var(--switch-off);
+  box-shadow: var(--switch-off-shadow);
+}
+
+.switch::before,
+.switch::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease;
+}
+
+.switch::before {
+  background: var(--action-bg);
+}
+
+.switch::after {
+  box-shadow: var(--switch-on-glow);
+}
+
+.switch[aria-checked='true']::before,
+.switch[aria-checked='true']::after {
+  opacity: 1;
+}
+
+.switch__knob {
+  position: absolute;
+  z-index: 1;
+  top: 2px;
+  left: 2px;
+  width: 27px;
+  height: 27px;
+  border-radius: 50%;
+  background: var(--switch-knob);
+  box-shadow: var(--switch-knob-shadow);
+  transition: transform 200ms var(--ease-out);
+}
+
+.switch[aria-checked='true'] .switch__knob {
+  transform: translateX(20px);
+}
+
+/* ---------- Ergebnis-Karte ---------- */
+
+.result {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.result__icon {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #FFFFFF;
+  background: var(--right-bg);
+  box-shadow: var(--result-icon-shadow);
+}
+
+.result--lost .result__icon {
+  color: var(--lost-ink);
+  background: var(--lost-bg);
+  box-shadow: var(--lost-shadow);
+}
+
+.result__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  line-height: 1.2;
+}
+
+.result__title {
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.result__sub {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.result__btn {
+  flex: none;
+  height: 42px;
+  margin-left: auto;
+  padding: 0 16px 0 13px;
+  border-radius: 21px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 15px;
+  font-weight: 800;
+  white-space: nowrap;
+  color: #FFFFFF;
+  background: var(--action-bg);
+  box-shadow: var(--action-shadow);
+}
+
+.result__btn:active {
+  filter: var(--key-pressed-filter);
+}
+
+/* Im Spielfeld: schwebt mittig über den unsichtbar gewordenen Zeilen. */
+.result--board {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  bottom: calc((var(--free) * var(--tile) + (var(--free) - 1) * 7px) / 2);
+  translate: -50% 50%;
+  width: max-content;
+  max-width: 100cqw;
+  padding: 10px 10px 10px 12px;
+  border-radius: var(--r-result);
+  background: var(--card);
+  box-shadow: var(--toast-shadow);
+  animation: result-in 380ms var(--ease-out) both;
+  animation-delay: var(--result-delay, 0ms);
+}
+
+.result--board .result__btn {
+  margin-left: 4px;
+}
+
+/* In der Tastatur-Karte: kompakte Zeile in der Höhe der Ausblenden-Reihe. */
+.result--keyboard {
+  height: 44px;
+  gap: 10px;
+  padding: 0 4px 0 6px;
+  animation: result-in 320ms var(--ease-out) both;
+  animation-delay: var(--result-delay, 0ms);
+}
+
+.result--keyboard .result__icon {
+  width: 30px;
+  height: 30px;
+}
+
+.result--keyboard .result__icon svg {
+  width: 15px;
+  height: 15px;
+}
+
+.result--keyboard .result__title {
+  font-size: 14px;
+}
+
+.result--keyboard .result__sub {
+  overflow: hidden;
+  font-size: 12px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.result--keyboard .result__btn {
+  height: 34px;
+  padding: 0 13px 0 11px;
+  border-radius: 17px;
+  gap: 6px;
+  font-size: 14px;
+}
+
+/* ---------- Meldungen ---------- */
+
+.toast-region {
+  position: absolute;
+  z-index: 20;
+  top: calc(env(safe-area-inset-top) + 7px);
+  left: 14px;
+  right: 14px;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 100%;
+  padding: 7px 18px 7px 7px;
+  border-radius: var(--r-toast);
+  font-size: 15px;
+  font-weight: 800;
+  background: var(--card);
+  box-shadow: var(--toast-shadow);
+  animation: toast 1600ms var(--ease-out) both;
+}
+
+.toast__icon {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--wrong-ink);
+  background: var(--wrong-bg);
+  box-shadow: var(--wrong-shadow-chip);
+}
+
+/* ---------- Dialog im iOS-Stil ---------- */
+
+.dialog-backdrop {
+  position: fixed;
+  z-index: 50;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: var(--dialog-backdrop);
+  animation: fade-in 180ms ease both;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.dialog {
+  width: min(290px, 100%);
+  overflow: hidden;
+  border-radius: var(--r-dialog);
+  text-align: center;
+  background: var(--dialog-bg);
+  box-shadow: var(--toast-shadow);
+  -webkit-backdrop-filter: blur(20px) saturate(1.6);
+  backdrop-filter: blur(20px) saturate(1.6);
+  animation: dialog-in 240ms var(--ease-out) both;
+}
+
+.dialog__body {
+  padding: 20px 18px 17px;
+}
+
+.dialog__title {
+  margin: 0 0 5px;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.dialog__text {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--ink-soft);
+}
+
+.dialog__actions {
+  display: flex;
+  border-top: 1px solid var(--dialog-separator);
+}
+
+.dialog__btn {
+  flex: 1 1 0;
+  height: 48px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--dialog-ink);
+}
+
+.dialog__btn + .dialog__btn {
+  border-left: 1px solid var(--dialog-separator);
+}
+
+.dialog__btn--primary {
+  font-weight: 800;
+}
+
+.dialog__btn:active {
+  background: var(--dialog-pressed);
+}
+
+.dialog__btn:focus-visible {
+  outline-offset: -3px;
+}
+
+/* ---------- Bewegung ---------- */
+
+@keyframes tile-pop {
+  from {
+    transform: scale(0.92);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes chip-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes tile-celebrate {
+  from {
+    color: var(--ink);
+    text-shadow: none;
+    box-shadow: var(--tile-shadow);
+  }
+}
+
+@keyframes fill-in {
+  from {
+    opacity: 0;
+    transform: scale(0.86);
+  }
+}
+
+@keyframes result-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+@keyframes toast {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.96);
+  }
+  12%,
+  84% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes toast-fade {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  12%,
+  84% {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: scale(1.08);
+  }
+}
+
+/* Bei reduzierter Bewegung nur Überblendungen. */
+@media (prefers-reduced-motion: reduce) {
+  .tile--typed {
+    animation: none;
+  }
+
+  .chip--pop,
+  .tile--celebrate > .fill--right,
+  .result--board,
+  .result--keyboard,
+  .dialog {
+    animation-name: fade-in;
+  }
+
+  .toast {
+    animation-name: toast-fade;
+  }
+
+  .switch__knob {
+    transition: none;
+  }
+
+  .key:active {
+    transform: none;
+  }
+}
