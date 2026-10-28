@@ -1,9 +1,9 @@
 import { commitGuess, createRound } from '../game/state';
-import type { GameState, Lang, Mark, Round } from '../game/types';
+import type { GameState, Lang, Mark, Mode, Round } from '../game/types';
 
-/** Runde mit bereits gewerteten Versuchen (ohne Wortlisten-Prüfung). */
+/** Runde mit bereits gewerteten Versuchen (ohne Wortlisten-Prüfung). Der Modus steht in extra, sonst Normal. */
 export function playedRound(solution: string, words: string[], extra: Partial<Round> = {}): Round {
-  let round = createRound(solution);
+  let round = createRound(solution, extra.mode ?? 'normal');
   for (const word of words) round = commitGuess({ ...round, input: word }, word);
   return { ...round, ...extra };
 }
@@ -15,6 +15,11 @@ export function withMarks(round: Round, row: number, pattern: string): Round {
   return { ...round, guesses: round.guesses.map((g, i) => (i === row ? { ...g, marks } : g)) };
 }
 
-export function stateWith(rounds: Partial<Record<Lang, Round>>, lang: Lang = 'de'): GameState {
-  return { lang, rounds, bags: { de: [], en: [] } };
+/** Spielstand mit Runden im Normal-Modus; Extreme-Runden und Modus optional. */
+export function stateWith(
+  rounds: Partial<Record<Lang, Round>>,
+  lang: Lang = 'de',
+  { mode = 'normal', extreme = {} }: { mode?: Mode; extreme?: Partial<Record<Lang, Round>> } = {},
+): GameState {
+  return { mode, lang, rounds: { normal: rounds, extreme }, bags: { de: [], en: [] } };
 }

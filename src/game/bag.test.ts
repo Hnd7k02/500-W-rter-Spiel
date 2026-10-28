@@ -11,7 +11,7 @@ describe('Shuffle-Bag', () => {
     let last: string | null = null;
     const seen: string[] = [];
     for (let i = 0; i < 250; i++) {
-      const next = drawWord(bag, all, last, random);
+      const next = drawWord(bag, all, last ? [last] : [], random);
       bag = next.bag;
       last = next.word;
       seen.push(next.word);
@@ -27,7 +27,7 @@ describe('Shuffle-Bag', () => {
       const random = seededRandom(seed);
       // Wort, das beim Neumischen zuerst käme, als «zuletzt gespielt» erzwingen
       const first = shuffle(all, seededRandom(seed))[0];
-      const next = drawWord([], all, first, random);
+      const next = drawWord([], all, [first], random);
       expect(next.word).not.toBe(first);
       expect(next.bag).toHaveLength(249);
       expect(new Set([next.word, ...next.bag]).size).toBe(250);
@@ -35,22 +35,22 @@ describe('Shuffle-Bag', () => {
   });
 
   it('speichert die Wörter selbst, keine Indizes', () => {
-    const { bag } = drawWord([], SOLUTIONS.de, null, seededRandom(7));
+    const { bag } = drawWord([], SOLUTIONS.de, [], seededRandom(7));
     for (const w of bag) expect(SOLUTIONS.de).toContain(w);
   });
 
   it('über den Würfel: 250 Runden ohne Wiederholung, danach nicht dasselbe Wort', () => {
     let state = createInitialState(1);
-    const words = [state.rounds.de!.solution];
+    const words = [state.rounds.normal.de!.solution];
     for (let i = 0; i < 249; i++) {
       state = reducer(state, { type: 'newRound', seed: 1000 + i });
-      words.push(state.rounds.de!.solution);
+      words.push(state.rounds.normal.de!.solution);
     }
     expect(new Set(words).size).toBe(250);
     expect(state.bags.de).toEqual([]);
     for (let seed = 0; seed < 50; seed++) {
       const after = reducer(state, { type: 'newRound', seed });
-      expect(after.rounds.de!.solution).not.toBe(words[249]);
+      expect(after.rounds.normal.de!.solution).not.toBe(words[249]);
     }
   });
 });

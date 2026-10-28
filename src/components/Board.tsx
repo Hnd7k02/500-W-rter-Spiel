@@ -1,6 +1,6 @@
 import { useEffect, useRef, type CSSProperties } from 'react';
-import { currentSlots, hasOwnMarks, isWinningRow, resultPlacement } from '../game/state';
-import { MAX_GUESSES, type Round } from '../game/types';
+import { currentSlots, hasOwnMarks, isWinningRow, maxGuesses, resultPlacement } from '../game/state';
+import type { Round } from '../game/types';
 import { CheckIcon, CrossIcon, EraserIcon, SwapIcon } from './icons';
 import { ResultCard } from './ResultCard';
 import { Row } from './Row';
@@ -20,8 +20,6 @@ interface BoardProps {
   toolsCovered: boolean;
   onNewWord: () => void;
 }
-
-const ROWS = Array.from({ length: MAX_GUESSES }, (_, i) => i);
 
 function shake(el: HTMLElement | null) {
   if (!el || typeof el.animate !== 'function') return;
@@ -59,7 +57,9 @@ export function Board({
   }, [shakeSignal]);
 
   const placement = resultPlacement(round);
-  const free = MAX_GUESSES - round.guesses.length;
+  // 8 Zeilen im Normal-Modus, 6 im Extreme-Modus
+  const rows = Array.from({ length: maxGuesses(round) }, (_, i) => i);
+  const free = rows.length - round.guesses.length;
   const activeRow = round.status === 'playing' ? round.guesses.length : -1;
   const current = { slots: currentSlots(round), input: round.input, solution: round.solution };
 
@@ -74,7 +74,8 @@ export function Board({
       <div
         className="board"
         data-placement={placement}
-        style={placement === 'board' ? ({ '--free': free } as CSSProperties) : undefined}
+        data-rows={rows.length}
+        style={{ '--rows': rows.length, ...(placement === 'board' && { '--free': free }) } as CSSProperties}
       >
         <div className="board__icons">
           <div className="board__legend" aria-hidden="true">
@@ -97,7 +98,7 @@ export function Board({
             )}
           </div>
         </div>
-        {ROWS.map((i) => {
+        {rows.map((i) => {
           const win = isWinningRow(round, i);
           return (
             <Row

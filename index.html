@@ -1,10 +1,23 @@
 <!doctype html>
-<html lang="de">
+<html lang="de" data-mode="normal">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#F1F2F6" />
     <meta name="color-scheme" content="light" />
+    <script>
+      // Zuletzt gewählter Modus schon vor dem ersten Bild: Im Extreme-Modus kein heller Blitz beim Start.
+      try {
+        var saved = JSON.parse(localStorage.getItem('500w:v2') || 'null');
+        if (saved && saved.mode === 'extreme') {
+          document.documentElement.dataset.mode = 'extreme';
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#050507');
+          document.querySelector('meta[name="color-scheme"]').setAttribute('content', 'dark');
+        }
+      } catch (e) {
+        // Kein Zugriff auf den Speicher: Normal-Modus
+      }
+    </script>
     <meta name="description" content="Wort-Ratespiel mit fünf Buchstaben auf Deutsch und Englisch." />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />

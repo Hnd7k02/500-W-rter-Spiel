@@ -31,7 +31,7 @@ describe('Eingabe und Wertung', () => {
     expect(rowText('Versuch 1, Eingabe: K O H L E')).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: 'Wort prüfen' }));
     expect(await within(board()).findByText('Versuch 1: 2 richtig, 2 im Wort, 1 falsch')).toBeTruthy();
-    expect(loadState()?.rounds.de?.guesses[0].word).toBe('KOHLE');
+    expect(loadState()?.rounds.normal.de?.guesses[0].word).toBe('KOHLE');
   });
 
   it('meldet zu kurze, unbekannte und doppelte Wörter', async () => {
@@ -49,7 +49,7 @@ describe('Eingabe und Wertung', () => {
     tap('LE');
     fireEvent.click(screen.getByRole('button', { name: 'Wort prüfen' }));
     expect(await screen.findByText('Schon versucht')).toBeTruthy();
-    expect(loadState()?.rounds.de?.guesses).toHaveLength(1);
+    expect(loadState()?.rounds.normal.de?.guesses).toHaveLength(1);
   });
 
   it('die physische Tastatur schreibt, löscht und prüft; Cmd/Ctrl/Alt bleiben frei', async () => {
@@ -171,7 +171,7 @@ describe('Ausblenden', () => {
     expect(key('Q').getAttribute('aria-disabled')).toBeNull();
     press('q');
     expect(rowText('Versuch 1, Eingabe: Q')).toBeTruthy();
-    expect(loadState()?.rounds.de?.hidden).toEqual([]);
+    expect(loadState()?.rounds.normal.de?.hidden).toEqual([]);
   });
 
   it('nach Sieg leert «Neues Wort» die Schraffur ebenfalls', () => {
@@ -179,7 +179,7 @@ describe('Ausblenden', () => {
     expect(key('Q').hasAttribute('data-hidden')).toBe(true);
     fireEvent.click(within(board()).getByRole('button', { name: 'Neues Wort' }));
     expect(key('Q').hasAttribute('data-hidden')).toBe(false);
-    expect(loadState()?.rounds.de?.hidden).toEqual([]);
+    expect(loadState()?.rounds.normal.de?.hidden).toEqual([]);
   });
 });
 
@@ -191,12 +191,12 @@ describe('Würfel und Sprache', () => {
     expect(within(dialog).getByText('Die laufende Runde wird beendet.')).toBeTruthy();
     fireEvent.click(within(dialog).getByRole('button', { name: 'Abbrechen' }));
     expect(screen.queryByRole('alertdialog')).toBeNull();
-    expect(loadState()?.rounds.de?.guesses).toHaveLength(1);
+    expect(loadState()?.rounds.normal.de?.guesses).toHaveLength(1);
 
     fireEvent.click(screen.getByRole('button', { name: 'Neues Wort würfeln' }));
     fireEvent.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Neues Wort' }));
     expect(screen.queryByRole('alertdialog')).toBeNull();
-    expect(loadState()?.rounds.de?.guesses).toHaveLength(0);
+    expect(loadState()?.rounds.normal.de?.guesses).toHaveLength(0);
   });
 
   it('nach Sieg startet die neue Runde ohne Nachfrage, der Würfel leuchtet', () => {
@@ -205,7 +205,7 @@ describe('Würfel und Sprache', () => {
     expect(dice.className).toContain('dice--glow');
     fireEvent.click(dice);
     expect(screen.queryByRole('alertdialog')).toBeNull();
-    expect(loadState()?.rounds.de?.status).toBe('playing');
+    expect(loadState()?.rounds.normal.de?.status).toBe('playing');
     expect(dice.className).not.toContain('dice--glow');
   });
 
@@ -263,14 +263,14 @@ describe('Ergebnis-Karte', () => {
     renderWith(stateWith({ en: playedRound('PLANT', [...words, 'HEART']) }, 'en'));
     fireEvent.click(within(keyboard()).getByRole('button', { name: 'Neues Wort' }));
     expect(screen.queryByTestId('result-card')).toBeNull();
-    expect(loadState()?.rounds.en?.status).toBe('playing');
-    expect(loadState()?.rounds.en?.solution).not.toBe('PLANT');
+    expect(loadState()?.rounds.normal.en?.status).toBe('playing');
+    expect(loadState()?.rounds.normal.en?.solution).not.toBe('PLANT');
   });
 
   it('nach dem Ende ist keine Eingabe mehr möglich', () => {
     renderWith(stateWith({ en: playedRound('PLANT', ['PLANT']) }, 'en'));
     tap('AB');
     press('c');
-    expect(loadState()?.rounds.en?.input).toBe('');
+    expect(loadState()?.rounds.normal.en?.input).toBe('');
   });
 });

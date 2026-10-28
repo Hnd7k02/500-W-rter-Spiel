@@ -31,23 +31,19 @@ export function shuffle<T>(items: readonly T[], random: Random): T[] {
 }
 
 /**
- * Zieht das nächste Wort aus dem gemischten Stapel (Shuffle-Bag).
- * Ist der Stapel leer, wird neu gemischt. Dabei kommt das zuletzt gespielte Wort nicht sofort wieder.
+ * Zieht das nächste Wort aus dem gemischten Stapel (Shuffle-Bag). Ist der Stapel leer, wird neu gemischt.
+ * Wörter aus `avoid` (das zuletzt gespielte und das laufende Wort des anderen Modus) kommen nicht
+ * sofort dran: Sie bleiben im Stapel und folgen später.
  */
 export function drawWord(
   bag: readonly string[],
   all: readonly string[],
-  last: string | null,
+  avoid: readonly string[],
   random: Random,
 ): { word: string; bag: string[] } {
-  let rest = [...bag];
-  if (rest.length === 0) {
-    rest = shuffle(all, random);
-    if (last !== null && rest.length > 1 && rest[0] === last) {
-      const j = 1 + Math.floor(random() * (rest.length - 1));
-      [rest[0], rest[j]] = [rest[j], rest[0]];
-    }
-  }
-  const [word, ...remaining] = rest;
-  return { word, bag: remaining };
+  const rest = bag.length > 0 ? [...bag] : shuffle(all, random);
+  const index = rest.findIndex((w) => !avoid.includes(w));
+  // Bleiben nur gemiedene Wörter übrig, wird trotzdem gezogen.
+  const [word] = rest.splice(Math.max(index, 0), 1);
+  return { word, bag: rest };
 }

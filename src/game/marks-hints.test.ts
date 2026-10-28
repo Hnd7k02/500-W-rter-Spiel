@@ -64,10 +64,10 @@ describe('Farben löschen', () => {
 
     let state = stateWith({ de: r });
     state = reducer(state, { type: 'clearMarks' });
-    state = reducer(state, { type: 'restoreMarks', lang: 'de', solution: 'ANDER', marks: snapshot });
-    expect(hasOwnMarks(state.rounds.de!)).toBe(false);
-    state = reducer(state, { type: 'restoreMarks', lang: 'de', solution: 'WOLKE', marks: snapshot });
-    expect(state.rounds.de!.guesses).toEqual(r.guesses);
+    state = reducer(state, { type: 'restoreMarks', mode: 'normal', lang: 'de', solution: 'ANDER', marks: snapshot });
+    expect(hasOwnMarks(state.rounds.normal.de!)).toBe(false);
+    state = reducer(state, { type: 'restoreMarks', mode: 'normal', lang: 'de', solution: 'WOLKE', marks: snapshot });
+    expect(state.rounds.normal.de!.guesses).toEqual(r.guesses);
   });
 
   it('zählt nur eigene Markierungen: Gewinnzeile und Hinweise nicht', () => {
@@ -168,16 +168,16 @@ describe('Hinweis', () => {
 
   it('ein Hinweis zählt als laufende Runde, ein neues Wort leert ihn', () => {
     let state = stateWith({ de: { ...playedRound('WOLKE', []), hints: [2] } });
-    expect(isRoundInProgress(state.rounds.de!)).toBe(true);
+    expect(isRoundInProgress(state.rounds.normal.de!)).toBe(true);
     state = reducer(state, { type: 'newRound', seed: 5 });
-    expect(state.rounds.de!.hints).toEqual([]);
+    expect(state.rounds.normal.de!.hints).toEqual([]);
   });
 
   it('der Reducer gibt den Hinweis mit Startwert reproduzierbar', () => {
     const state = stateWith({ de: playedRound('WOLKE', []) });
     const a = reducer(state, { type: 'hint', seed: 42 });
     const b = reducer(state, { type: 'hint', seed: 42 });
-    expect(a.rounds.de!.hints).toEqual(b.rounds.de!.hints);
-    expect(a.rounds.de!.hints).toHaveLength(1);
+    expect(a.rounds.normal.de!.hints).toEqual(b.rounds.normal.de!.hints);
+    expect(a.rounds.normal.de!.hints).toHaveLength(1);
   });
 });

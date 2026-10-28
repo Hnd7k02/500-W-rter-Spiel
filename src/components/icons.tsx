@@ -133,3 +133,12 @@ export function EraserIcon({ size = 15, strokeWidth = 2.1 }: IconProps) {
     </Svg>
   );
 }
+
+/** Flamme (Ergebnis-Karte «Verbrannt» im Extreme-Modus). */
+export function FlameIcon({ size = 19, strokeWidth = 2.1 }: IconProps) {
+  return (
+    <Svg size={size} strokeWidth={strokeWidth}>
+      <path d="M12 3c.5 3.2 3.4 4.9 4.8 7.6 1.2 2.4.9 5.3-1 7.1A5.7 5.7 0 0 1 6.3 15c-.1-2.1.8-3.8 2.1-5 .2 1.5 1 2.6 2.1 3-.4-3.3.1-7 1.5-10Z" />
+    </Svg>
+  );
+}

@@ -2,12 +2,13 @@ import { drawWord, seededRandom, type Random } from './bag';
 import { score } from './score';
 import { SOLUTIONS } from './words';
 import {
-  MAX_GUESSES,
+  RULES,
   WORD_LENGTH,
   type GameState,
   type Guess,
   type Lang,
   type Mark,
+  type Mode,
   type ResultPlacement,
   type Round,
 } from './types';
@@ -18,50 +19,68 @@ export type Action =
   /** Buchstabe auf der physischen Tastatur: schreibt nur, wenn der Schalter aus ist. */
   | { type: 'physicalKey'; letter: string }
   | { type: 'backspace' }
-  /** Schreibt eine bereits geprüfte Eingabe fest. */
-  | { type: 'commit'; lang: Lang; word: string }
+  /** Schreibt eine bereits geprüfte Eingabe fest, nur in der Runde, in der sie getippt wurde. */
+  | { type: 'commit'; mode: Mode; lang: Lang; word: string }
   | { type: 'mark'; row: number; col: number }
   | { type: 'toggleHideMode' }
   | { type: 'newRound'; seed: number }
   | { type: 'setLang'; lang: Lang; seed: number }
+  /** Normal oder «500 Extreme». Fehlt im Modus eine Runde, startet sie. */
+  | { type: 'setMode'; mode: Mode; seed: number }
   /** Zweiter Tipp auf «?»: ein grüner Buchstabe für die aktuelle Zeile */
   | { type: 'hint'; seed: number }
   /** Radierer: alle eigenen Markierungen entfernen */
   | { type: 'clearMarks' }
   /** «Rückgängig» nach dem Radierer, nur für dieselbe Runde */
-  | { type: 'restoreMarks'; lang: Lang; solution: string; marks: Mark[][] };
+  | { type: 'restoreMarks'; mode: Mode; lang: Lang; solution: string; marks: Mark[][] };
 
 const LETTER = /^[A-Z]$/;
 const COLS = Array.from({ length: WORD_LENGTH }, (_, i) => i);
 
-export function createRound(solution: string): Round {
-  return { solution, guesses: [], input: '', hints: [], hidden: [], hideMode: false, status: 'playing' };
+export function createRound(solution: string, mode: Mode = 'normal'): Round {
+  return { mode, solution, guesses: [], input: '', hints: [], hidden: [], hideMode: false, status: 'playing' };
 }
 
-/** Zieht ein neues Lösungswort aus dem Stapel der Sprache und startet damit eine frische Runde. */
-export function startRound(state: GameState, lang: Lang, seed: number): GameState {
-  const last = state.rounds[lang]?.solution ?? null;
-  const { word, bag } = drawWord(state.bags[lang], SOLUTIONS[lang], last, seededRandom(seed));
+/** Anzahl Versuche der Runde: 8 im Normal-Modus, 6 im Extreme-Modus */
+export function maxGuesses(round: Round): number {
+  return RULES[round.mode].maxGuesses;
+}
+
+/**
+ * Zieht ein neues Lösungswort aus dem Stapel der Sprache und startet damit eine frische Runde im Modus.
+ * Der Stapel gehört der Sprache, nicht dem Modus: So wiederholen sich Wörter auch über beide Modi nicht.
+ */
+export function startRound(state: GameState, mode: Mode, lang: Lang, seed: number): GameState {
+  // Nicht gleich wieder: das bisherige Wort dieses Modus und das laufende Wort des anderen Modus
+  const avoid = [state.rounds.normal[lang]?.solution, state.rounds.extreme[lang]?.solution].filter(
+    (w): w is string => w !== undefined,
+  );
+  const { word, bag } = drawWord(state.bags[lang], SOLUTIONS[lang], avoid, seededRandom(seed));
   return {
     ...state,
-    rounds: { ...state.rounds, [lang]: createRound(word) },
+    rounds: { ...state.rounds, [mode]: { ...state.rounds[mode], [lang]: createRound(word, mode) } },
     bags: { ...state.bags, [lang]: bag },
   };
 }
 
-/** Allererster Start: Deutsch ist aktiv. */
+/** Allererster Start: Normal-Modus, Deutsch. */
 export function createInitialState(seed: number): GameState {
-  return startRound({ lang: 'de', rounds: {}, bags: { de: [], en: [] } }, 'de', seed);
+  return startRound(
+    { mode: 'normal', lang: 'de', rounds: { normal: {}, extreme: {} }, bags: { de: [], en: [] } },
+    'normal',
+    'de',
+    seed,
+  );
 }
 
-/** Sorgt dafür, dass die aktive Sprache eine Runde hat. */
+/** Sorgt dafür, dass Modus und Sprache eine Runde haben. */
 export function ensureActiveRound(state: GameState, seed: number): GameState {
-  return state.rounds[state.lang] ? state : startRound(state, state.lang, seed);
+  return state.rounds[state.mode][state.lang] ? state : startRound(state, state.mode, state.lang, seed);
 }
 
 export function activeRound(state: GameState): Round {
-  const round = state.rounds[state.lang];
-  if (!round) throw new Error('Keine Runde für die aktive Sprache');
+  const round = state.rounds[state.mode][state.lang];
+  if (!round) throw new Error('Keine Runde für Modus und Sprache');
   return round;
 }
 
@@ -101,11 +120,11 @@ export function isWinningRow(round: Round, row: number): boolean {
 
 /**
  * Platz der Ergebnis-Karte: Sind mindestens zwei Zeilen leer, steht sie im Spielfeld.
- * Sonst (Sieg im 7. oder 8. Versuch, Niederlage) ersetzt sie die Ausblenden-Reihe der Tastatur.
+ * Sonst (Sieg in einem der letzten zwei Versuche, Niederlage) ersetzt sie die Ausblenden-Reihe der Tastatur.
  */
 export function resultPlacement(round: Round): ResultPlacement {
   if (round.status === 'playing') return 'none';
-  return MAX_GUESSES - round.guesses.length >= 2 ? 'board' : 'keyboard';
+  return maxGuesses(round) - round.guesses.length >= 2 ? 'board' : 'keyboard';
 }
 
 /** Schraffieren per Antippen geht, solange der Schalter an und sichtbar ist. */
@@ -160,9 +179,12 @@ export function restoreMarks(round: Round, snapshot: Mark[][]): Round {
   return { ...round, guesses };
 }
 
-/** Kann «?» noch helfen? Nicht nach Rundenende und nicht, wenn alle Plätze schon Hinweise sind. */
+/**
+ * Kann «?» noch helfen? Nicht im Extreme-Modus, nicht nach Rundenende und nicht,
+ * wenn alle Plätze schon Hinweise sind.
+ */
 export function canHint(round: Round): boolean {
-  return round.status === 'playing' && round.hints.length < WORD_LENGTH;
+  return RULES[round.mode].hints && round.status === 'playing' && round.hints.length < WORD_LENGTH;
 }
 
 /**
@@ -249,7 +271,7 @@ export function commitGuess(round: Round, word: string): Round {
     round.status !== 'playing' ||
     currentWord(round) !== word ||
     checkGuess(round, word) !== 'ok' ||
-    round.guesses.length >= MAX_GUESSES
+    round.guesses.length >= maxGuesses(round)
   ) {
     return round;
   }
@@ -259,7 +281,7 @@ export function commitGuess(round: Round, word: string): Round {
   const marks = COLS.map((col): Mark => (won || hints.includes(col) ? 3 : 0));
   const guess: Guess = { word, score: result, marks, hints };
   const guesses = [...round.guesses, guess];
-  const status = won ? 'won' : guesses.length >= MAX_GUESSES ? 'lost' : 'playing';
+  const status = won ? 'won' : guesses.length >= maxGuesses(round) ? 'lost' : 'playing';
   return { ...round, guesses, input: '', hints: [], status };
 }
 
@@ -273,38 +295,49 @@ export function cycleMark(round: Round, row: number, col: number): Round {
   return { ...round, guesses };
 }
 
-function updateRound(state: GameState, lang: Lang, update: (round: Round) => Round): GameState {
-  const round = state.rounds[lang];
+function updateRound(state: GameState, mode: Mode, lang: Lang, update: (round: Round) => Round): GameState {
+  const round = state.rounds[mode][lang];
   if (!round) return state;
   const next = update(round);
-  return next === round ? state : { ...state, rounds: { ...state.rounds, [lang]: next } };
+  return next === round ? state : { ...state, rounds: { ...state.rounds, [mode]: { ...state.rounds[mode], [lang]: next } } };
+}
+
+/** Änderung an der Runde, die gerade zu sehen ist */
+function updateActive(state: GameState, update: (round: Round) => Round): GameState {
+  return updateRound(state, state.mode, state.lang, update);
 }
 
 export function reducer(state: GameState, action: Action): GameState {
   switch (action.type) {
     case 'setLang': {
-      if (action.lang === state.lang && state.rounds[action.lang]) return state;
+      if (action.lang === state.lang && state.rounds[state.mode][action.lang]) return state;
       return ensureActiveRound({ ...state, lang: action.lang }, action.seed);
     }
+    case 'setMode': {
+      if (action.mode === state.mode && state.rounds[action.mode][state.lang]) return state;
+      return ensureActiveRound({ ...state, mode: action.mode }, action.seed);
+    }
     case 'newRound':
-      return startRound(state, state.lang, action.seed);
+      return startRound(state, state.mode, state.lang, action.seed);
     case 'commit':
-      return updateRound(state, action.lang, (r) => commitGuess(r, action.word));
+      return updateRound(state, action.mode, action.lang, (r) => commitGuess(r, action.word));
     case 'tapKey':
-      return updateRound(state, state.lang, (r) => tapKey(r, action.letter));
+      return updateActive(state, (r) => tapKey(r, action.letter));
     case 'physicalKey':
-      return updateRound(state, state.lang, (r) => pressPhysicalKey(r, action.letter));
+      return updateActive(state, (r) => pressPhysicalKey(r, action.letter));
     case 'backspace':
-      return updateRound(state, state.lang, deleteLetter);
+      return updateActive(state, deleteLetter);
     case 'mark':
-      return updateRound(state, state.lang, (r) => cycleMark(r, action.row, action.col));
+      return updateActive(state, (r) => cycleMark(r, action.row, action.col));
     case 'toggleHideMode':
-      return updateRound(state, state.lang, toggleHideMode);
+      return updateActive(state, toggleHideMode);
     case 'hint':
-      return updateRound(state, state.lang, (r) => giveHint(r, seededRandom(action.seed)));
+      return updateActive(state, (r) => giveHint(r, seededRandom(action.seed)));
     case 'clearMarks':
-      return updateRound(state, state.lang, clearMarks);
+      return updateActive(state, clearMarks);
     case 'restoreMarks':
-      return updateRound(state, action.lang, (r) => (r.solution === action.solution ? restoreMarks(r, action.marks) : r));
+      return updateRound(state, action.mode, action.lang, (r) =>
+        r.solution === action.solution ? restoreMarks(r, action.marks) : r,
+      );
   }
 }

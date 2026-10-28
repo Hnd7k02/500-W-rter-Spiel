@@ -127,7 +127,7 @@ describe('Ausblenden', () => {
 
   it('Schalter aus: die Schraffur bleibt, gesperrte Buchstaben schreiben weder per Tippen noch physisch', () => {
     let state: GameState = stateWith({ de: playedRound('WOLKE', []) });
-    const de = () => state.rounds.de!;
+    const de = () => state.rounds.normal.de!;
     state = reducer(state, { type: 'tapKey', letter: 'K' }); // schon getippt
     state = reducer(state, { type: 'toggleHideMode' });
     state = reducer(state, { type: 'tapKey', letter: 'X' });
@@ -151,34 +151,34 @@ describe('Ausblenden', () => {
 
   it('zurückholen: Schalter wieder an und die Taste nochmals antippen', () => {
     let state: GameState = stateWith({ de: playedRound('WOLKE', [], { hidden: ['X'] }) });
-    expect(isLocked(state.rounds.de!, 'X')).toBe(true);
+    expect(isLocked(state.rounds.normal.de!, 'X')).toBe(true);
     state = reducer(state, { type: 'toggleHideMode' });
-    expect(isHideActive(state.rounds.de!)).toBe(true);
-    expect(isLocked(state.rounds.de!, 'X')).toBe(false);
+    expect(isHideActive(state.rounds.normal.de!)).toBe(true);
+    expect(isLocked(state.rounds.normal.de!, 'X')).toBe(false);
     state = reducer(state, { type: 'tapKey', letter: 'X' });
     state = reducer(state, { type: 'toggleHideMode' });
-    expect(state.rounds.de!.hidden).toEqual([]);
+    expect(state.rounds.normal.de!.hidden).toEqual([]);
     state = reducer(state, { type: 'tapKey', letter: 'X' });
-    expect(state.rounds.de!.input).toBe('X');
+    expect(state.rounds.normal.de!.input).toBe('X');
   });
 
   it('ein neues Wort leert die Schraffur und schaltet den Schalter aus', () => {
     let state: GameState = stateWith({ de: playedRound('WOLKE', ['STERN'], { hideMode: true, hidden: ['A', 'Q'] }) });
     state = reducer(state, { type: 'newRound', seed: 3 });
-    expect(state.rounds.de!.hidden).toEqual([]);
-    expect(state.rounds.de!.hideMode).toBe(false);
-    expect(state.rounds.de!.guesses).toEqual([]);
+    expect(state.rounds.normal.de!.hidden).toEqual([]);
+    expect(state.rounds.normal.de!.hideMode).toBe(false);
+    expect(state.rounds.normal.de!.guesses).toEqual([]);
     state = reducer(state, { type: 'physicalKey', letter: 'Q' });
-    expect(state.rounds.de!.input).toBe('Q');
+    expect(state.rounds.normal.de!.input).toBe('Q');
   });
 
   it('auch nach Sieg oder Niederlage leert das neue Wort die Schraffur', () => {
     for (const words of [['WOLKE'], ['STERN', 'LAMPE', 'BLUME', 'KOHLE', 'TASSE', 'KASSE', 'ABEND', 'ADLER']]) {
       let state: GameState = stateWith({ de: playedRound('WOLKE', words, { hidden: ['Q'] }) });
-      expect(state.rounds.de!.status).not.toBe('playing');
+      expect(state.rounds.normal.de!.status).not.toBe('playing');
       state = reducer(state, { type: 'newRound', seed: 4 });
-      expect(state.rounds.de!.hidden).toEqual([]);
-      expect(state.rounds.de!.hideMode).toBe(false);
+      expect(state.rounds.normal.de!.hidden).toEqual([]);
+      expect(state.rounds.normal.de!.hideMode).toBe(false);
     }
   });
 
@@ -188,13 +188,13 @@ describe('Ausblenden', () => {
     state = reducer(state, { type: 'tapKey', letter: 'Q' });
     state = reducer(state, { type: 'toggleHideMode' });
     state = reducer(state, { type: 'setLang', lang: 'en', seed: 9 });
-    expect(state.rounds.en!.hidden).toEqual([]);
+    expect(state.rounds.normal.en!.hidden).toEqual([]);
     state = reducer(state, { type: 'physicalKey', letter: 'Q' });
-    expect(state.rounds.en!.input).toBe('Q');
+    expect(state.rounds.normal.en!.input).toBe('Q');
     state = reducer(state, { type: 'setLang', lang: 'de', seed: 10 });
-    expect(state.rounds.de!.hidden).toEqual(['Q']);
+    expect(state.rounds.normal.de!.hidden).toEqual(['Q']);
     state = reducer(state, { type: 'physicalKey', letter: 'Q' });
-    expect(state.rounds.de!.input).toBe('');
+    expect(state.rounds.normal.de!.input).toBe('');
   });
 });
 
@@ -202,34 +202,34 @@ describe('Sprache', () => {
   it('beim allerersten Start ist Deutsch aktiv', () => {
     const state = createInitialState(5);
     expect(state.lang).toBe('de');
-    expect(state.rounds.de).toBeDefined();
-    expect(state.rounds.en).toBeUndefined();
+    expect(state.rounds.normal.de).toBeDefined();
+    expect(state.rounds.normal.en).toBeUndefined();
   });
 
   it('beide Runden bleiben getrennt erhalten', () => {
     let state = createInitialState(5);
     for (const l of 'KOH') state = reducer(state, { type: 'tapKey', letter: l });
-    const de = state.rounds.de!;
+    const de = state.rounds.normal.de!;
 
     state = reducer(state, { type: 'setLang', lang: 'en', seed: 9 });
     expect(state.lang).toBe('en');
-    const en = state.rounds.en!;
+    const en = state.rounds.normal.en!;
     expect(en.input).toBe('');
     expect(en.status).toBe('playing');
     for (const l of 'PLA') state = reducer(state, { type: 'tapKey', letter: l });
     state = reducer(state, { type: 'toggleHideMode' });
 
     state = reducer(state, { type: 'setLang', lang: 'de', seed: 10 });
-    expect(state.rounds.de).toBe(de);
-    expect(state.rounds.en!.input).toBe('PLA');
-    expect(state.rounds.en!.solution).toBe(en.solution);
-    expect(state.rounds.en!.hideMode).toBe(true);
-    expect(state.rounds.de!.hideMode).toBe(false);
+    expect(state.rounds.normal.de).toBe(de);
+    expect(state.rounds.normal.en!.input).toBe('PLA');
+    expect(state.rounds.normal.en!.solution).toBe(en.solution);
+    expect(state.rounds.normal.en!.hideMode).toBe(true);
+    expect(state.rounds.normal.de!.hideMode).toBe(false);
 
     // Zurück auf Englisch: keine neue Runde, nichts geht verloren.
     state = reducer(state, { type: 'setLang', lang: 'en', seed: 11 });
-    expect(state.rounds.en!.solution).toBe(en.solution);
-    expect(state.rounds.en!.input).toBe('PLA');
+    expect(state.rounds.normal.en!.solution).toBe(en.solution);
+    expect(state.rounds.normal.en!.input).toBe('PLA');
   });
 
   it('die Wörter kommen aus der Liste der jeweiligen Sprache', () => {
@@ -237,7 +237,7 @@ describe('Sprache', () => {
     state = reducer(state, { type: 'setLang', lang: 'en', seed: 6 });
     expect(state.bags.en).toHaveLength(249);
     expect(state.bags.de).toHaveLength(249);
-    expect(state.bags.en).not.toContain(state.rounds.en!.solution);
+    expect(state.bags.en).not.toContain(state.rounds.normal.en!.solution);
   });
 });
 

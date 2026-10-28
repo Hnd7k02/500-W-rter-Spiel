@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useLayoutEffect, useReducer, useRef, useState, type MouseEvent } from 'react';
+import { flushSync } from 'react-dom';
 import { Board } from './components/Board';
 import { ConfirmDialog } from './components/ConfirmDialog';
 import { Header } from './components/Header';
 import { Keyboard } from './components/Keyboard';
+import { RESULT_TITLES } from './components/ResultCard';
 import { Toast, type ToastMessage } from './components/Toast';
 import { newSeed, seededRandom } from './game/bag';
 import { score } from './game/score';
@@ -15,10 +17,11 @@ import {
   ensureActiveRound,
   giveHint,
   isRoundInProgress,
+  maxGuesses,
   reducer,
 } from './game/state';
 import { loadState, saveState } from './game/storage';
-import { MAX_GUESSES, type GameState, type Lang } from './game/types';
+import { RULES, type GameState, type Lang, type Mode } from './game/types';
 import { loadValidWords } from './game/words';
 
 function initState(): GameState {
@@ -30,6 +33,42 @@ const ERRORS = {
   unknown: 'Nicht in der Wortliste',
   repeat: 'Schon versucht',
 } as const;
+
+/** Farbe der Browser- und Statusleiste pro Modus, passend zum Seitenhintergrund */
+export const THEME_COLORS: Record<Mode, string> = { normal: '#F1F2F6', extreme: '#050507' };
+
+/** Dauer der Überblendung beim Wechsel zwischen Normal und «500 Extreme» */
+export const MODE_FADE_MS = 250;
+
+/**
+ * Tokens hängen an <html data-mode>. Dazu passen theme-color (ältere iOS-Versionen färben damit die
+ * Leisten) und color-scheme. Safari ab iOS 26 nimmt die Farbe der Leisten direkt vom Seitenhintergrund.
+ */
+function applyModeToDocument(mode: Mode) {
+  document.documentElement.dataset.mode = mode;
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', THEME_COLORS[mode]);
+  document.querySelector('meta[name="color-scheme"]')?.setAttribute('content', mode === 'extreme' ? 'dark' : 'light');
+}
+
+type ViewTransitionDocument = Document & {
+  startViewTransition?: (update: () => void) => { ready?: Promise<unknown> } | undefined;
+};
+
+/** Wechselt den Look mit kurzer Überblendung: per View Transition, sonst blendet die App kurz ein. */
+function crossfade(update: () => void) {
+  const doc = document as ViewTransitionDocument;
+  if (typeof doc.startViewTransition === 'function') {
+    const transition = doc.startViewTransition(() => flushSync(update));
+    // Schnell zweimal getippt: Die erste Überblendung fällt weg, das ist kein Fehler.
+    transition?.ready?.catch(() => undefined);
+    return;
+  }
+  update();
+  const app = document.querySelector('.app');
+  if (app && typeof app.animate === 'function') {
+    app.animate([{ opacity: 0.4 }, { opacity: 1 }], { duration: MODE_FADE_MS, easing: 'ease-out' });
+  }
+}
 
 /** So lange bleibt «?» nach dem ersten Tipp eingedrückt. */
 export const HINT_ARMED_MS = 3000;
@@ -45,7 +84,7 @@ export function App() {
   const [shakeSignal, setShakeSignal] = useState(0);
   const [confirmOpen, setConfirmOpen] = useState(false);
   /** Die eben gewertete Zeile, nur für Animationen in dieser Sitzung */
-  const [fresh, setFresh] = useState<{ lang: Lang; row: number } | null>(null);
+  const [fresh, setFresh] = useState<{ mode: Mode; lang: Lang; row: number } | null>(null);
   /** Unsichtbarer Text für Screenreader nach jedem Versuch */
   const [announcement, setAnnouncement] = useState('');
   /** «?» nach dem ersten Tipp: eingedrückt, der zweite Tipp gibt den Hinweis */
@@ -62,6 +101,9 @@ export function App() {
 
   // Speichern: Nach einem Neustart geht es genau dort weiter.
   useEffect(() => saveState(state), [state]);
+
+  // Look des Modus: vor dem Zeichnen, damit auch die Überblendung schon die neuen Farben zeigt.
+  useLayoutEffect(() => applyModeToDocument(state.mode), [state.mode]);
 
   useEffect(() => {
     if (!toast) return;
@@ -85,11 +127,11 @@ export function App() {
     };
   }, [hintArmed]);
 
-  // Nach Rundenende, Sprachwechsel oder neuem Wort ist «?» nicht mehr eingedrückt.
+  // Nach Rundenende, Sprach- oder Moduswechsel oder neuem Wort ist «?» nicht mehr eingedrückt.
   const hintEnabled = canHint(round);
   useEffect(() => {
     setHintArmed(false);
-  }, [state.lang, round.solution, hintEnabled]);
+  }, [state.mode, state.lang, round.solution, hintEnabled]);
 
   // Wortliste der aktiven Sprache im Hintergrund laden, sobald der erste Screen steht.
   useEffect(() => {
@@ -106,8 +148,8 @@ export function App() {
 
   const submit = useCallback(async () => {
     if (submitting.current) return;
-    const { lang } = stateRef.current;
-    const before = stateRef.current.rounds[lang];
+    const { mode, lang } = stateRef.current;
+    const before = stateRef.current.rounds[mode][lang];
     if (!before || before.status !== 'playing') return;
     // Hinweis-Buchstaben zählen normal mit.
     const word = currentWord(before);
@@ -129,9 +171,12 @@ export function App() {
       submitting.current = false;
     }
 
+    // Inzwischen Sprache oder Modus gewechselt? Dann bleibt die Eingabe einfach stehen.
     const now = stateRef.current;
-    const current = now.rounds[lang];
-    if (now.lang !== lang || !current || current.status !== 'playing' || currentWord(current) !== word) return;
+    const current = now.rounds[mode][lang];
+    if (now.mode !== mode || now.lang !== lang || !current || current.status !== 'playing' || currentWord(current) !== word) {
+      return;
+    }
     const check = checkGuess(current, word, valid);
     if (check !== 'ok') {
       fail(ERRORS[check]);
@@ -140,12 +185,13 @@ export function App() {
 
     const row = current.guesses.length;
     const [right, inWord, wrong] = score(word, current.solution);
+    const titles = RESULT_TITLES[mode];
     let spoken = `${word}: ${right} richtig, ${inWord} im Wort, ${wrong} falsch.`;
-    if (right === 5) spoken = `Geschafft! ${word} ${row === 0 ? 'im ersten Versuch' : `in ${row + 1} Versuchen`}.`;
-    else if (row + 1 === MAX_GUESSES) spoken += ` Leider nicht. Das Wort war: ${current.solution}.`;
+    if (right === 5) spoken = `${titles.won} ${word} ${row === 0 ? 'im ersten Versuch' : `in ${row + 1} Versuchen`}.`;
+    else if (row + 1 === maxGuesses(current)) spoken += ` ${titles.lost}. Das Wort war: ${current.solution}.`;
     setAnnouncement(spoken);
-    setFresh({ lang, row });
-    dispatch({ type: 'commit', lang, word });
+    setFresh({ mode, lang, row });
+    dispatch({ type: 'commit', mode, lang, word });
   }, [fail]);
 
   const startNewWord = useCallback(() => {
@@ -172,7 +218,7 @@ export function App() {
 
   // Radierer: alle eigenen Markierungen weg, 5 s lang rückgängig zu machen.
   const onClearMarks = () => {
-    const { lang } = state;
+    const { mode, lang } = state;
     const { solution } = round;
     const marks = round.guesses.map((g) => [...g.marks]);
     dispatch({ type: 'clearMarks' });
@@ -185,7 +231,7 @@ export function App() {
       action: {
         label: 'Rückgängig',
         onAction: () => {
-          dispatch({ type: 'restoreMarks', lang, solution, marks });
+          dispatch({ type: 'restoreMarks', mode, lang, solution, marks });
           setToast((t) => (t?.id === id ? null : t));
         },
       },
@@ -201,6 +247,17 @@ export function App() {
     if (lang === state.lang) return;
     setFresh(null);
     dispatch({ type: 'setLang', lang, seed: newSeed() });
+  };
+
+  // Logo-Tipp: Normal ⇄ «500 Extreme». Jede Runde bleibt, wie sie ist.
+  const onToggleMode = () => {
+    const mode: Mode = state.mode === 'extreme' ? 'normal' : 'extreme';
+    crossfade(() => {
+      setFresh(null);
+      setHintArmed(false);
+      setAnnouncement(mode === 'extreme' ? '500 Extreme: 6 Versuche, keine Hinweise.' : '500 Wörter: 8 Versuche.');
+      dispatch({ type: 'setMode', mode, seed: newSeed() });
+    });
   };
 
   // Physische Tastatur: A–Z, Enter, Backspace. Kombinationen mit Cmd, Ctrl oder Alt bleiben frei.
@@ -229,17 +286,20 @@ export function App() {
     if (e.target instanceof Element && e.target.closest('button')) e.preventDefault();
   };
 
-  const popRow = fresh && fresh.lang === state.lang ? fresh.row : null;
+  const popRow = fresh && fresh.mode === state.mode && fresh.lang === state.lang ? fresh.row : null;
   const celebrate = popRow !== null && round.status === 'won' && popRow === round.guesses.length - 1;
 
   return (
     <>
       <div className="app" inert={confirmOpen} onMouseDown={keepFocus}>
         <Header
+          mode={state.mode}
           lang={state.lang}
           diceGlow={round.status !== 'playing'}
+          hintVisible={RULES[state.mode].hints}
           hintArmed={hintArmed}
           hintEnabled={hintEnabled}
+          onToggleMode={onToggleMode}
           onLang={onLang}
           onHint={onHint}
           onDice={onDice}

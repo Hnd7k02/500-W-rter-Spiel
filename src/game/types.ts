@@ -2,8 +2,24 @@ export type Lang = 'de' | 'en';
 
 export const LANGS: readonly Lang[] = ['de', 'en'];
 
+/** Normal oder «500 Extreme»: weniger Versuche, keine Hinweise, eigener Look. */
+export type Mode = 'normal' | 'extreme';
+
+export const MODES: readonly Mode[] = ['normal', 'extreme'];
+
+export interface Rules {
+  /** Anzahl Versuche, zugleich Anzahl Zeilen im Spielfeld */
+  maxGuesses: number;
+  /** Gibt es den Hinweis-Button «?»? */
+  hints: boolean;
+}
+
+export const RULES: Record<Mode, Rules> = {
+  normal: { maxGuesses: 8, hints: true },
+  extreme: { maxGuesses: 6, hints: false },
+};
+
 export const WORD_LENGTH = 5;
-export const MAX_GUESSES = 8;
 
 /** Eigene Markierung einer Kachel: 0 ohne, 1 Falsch, 2 Im Wort, 3 Richtig. */
 export type Mark = 0 | 1 | 2 | 3;
@@ -23,6 +39,8 @@ export interface Guess {
 }
 
 export interface Round {
+  /** Modus der Runde: bestimmt die Anzahl Versuche und ob es Hinweise gibt. */
+  mode: Mode;
   solution: string;
   guesses: Guess[];
   /**
@@ -40,10 +58,12 @@ export interface Round {
 }
 
 export interface GameState {
+  /** Zuletzt gewählter Modus */
+  mode: Mode;
   lang: Lang;
-  /** Jede Sprache hat ihre eigene Runde. Fehlt eine, startet sie beim ersten Umschalten. */
-  rounds: Partial<Record<Lang, Round>>;
-  /** Shuffle-Bags: die noch nicht gezogenen Lösungswörter pro Sprache. */
+  /** Jeder Modus hat pro Sprache seine eigene Runde (4 Runden). Fehlt eine, startet sie beim ersten Umschalten. */
+  rounds: Record<Mode, Partial<Record<Lang, Round>>>;
+  /** Shuffle-Bags: die noch nicht gezogenen Lösungswörter pro Sprache, gemeinsam für beide Modi. */
   bags: Record<Lang, string[]>;
 }
 

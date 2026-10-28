@@ -60,7 +60,7 @@ describe('Farben löschen', () => {
     expect(key('E').getAttribute('data-mark')).toBeNull();
     expect(eraser()).toBeNull();
     expect(screen.getByText('Farben gelöscht')).toBeTruthy();
-    expect(loadState()?.rounds.de?.guesses.every((g) => g.marks.every((m) => m === 0))).toBe(true);
+    expect(loadState()?.rounds.normal.de?.guesses.every((g) => g.marks.every((m) => m === 0))).toBe(true);
 
     fireEvent.click(screen.getByRole('button', { name: 'Rückgängig' }));
     expect(within(board()).getAllByRole('button', { name: 'E, richtig' })).toHaveLength(1);
@@ -105,12 +105,12 @@ describe('Hinweis', () => {
     fireEvent.click(hintBtn());
     expect(hintBtn().getAttribute('aria-pressed')).toBe('true');
     expect(screen.getByText(BUBBLE)).toBeTruthy();
-    expect(loadState()?.rounds.de?.hints).toEqual([]);
+    expect(loadState()?.rounds.normal.de?.hints).toEqual([]);
 
     fireEvent.click(hintBtn());
     expect(hintBtn().getAttribute('aria-pressed')).toBe('false');
     expect(screen.queryByText(BUBBLE)).toBeNull();
-    const [col] = loadState()!.rounds.de!.hints;
+    const [col] = loadState()!.rounds.normal.de!.hints;
     expect(col).toBeGreaterThanOrEqual(0);
     expect(rowText(`Versuch 1, Hinweis an Stelle ${col + 1}: ${'WOLKE'[col]}`)).toBeTruthy();
     expect(key('WOLKE'[col]).getAttribute('data-mark')).toBe('right');
@@ -131,7 +131,7 @@ describe('Hinweis', () => {
     expect(screen.queryByText(BUBBLE)).toBeNull();
     // Ein einzelner Tipp danach drückt nur wieder ein.
     fireEvent.click(hintBtn());
-    expect(loadState()?.rounds.de?.hints).toEqual([]);
+    expect(loadState()?.rounds.normal.de?.hints).toEqual([]);
   });
 
   it('springt bei einem Tipp woanders zurück, dieser Tipp wirkt normal', () => {
@@ -140,7 +140,7 @@ describe('Hinweis', () => {
     fireEvent.click(key('K'));
     expect(hintBtn().getAttribute('aria-pressed')).toBe('false');
     expect(rowText('Versuch 1, Eingabe: K')).toBeTruthy();
-    expect(loadState()?.rounds.de?.hints).toEqual([]);
+    expect(loadState()?.rounds.normal.de?.hints).toEqual([]);
   });
 
   it('blendet «Farben löschen» unter der Sprechblase aus, ein Tipp auf die Blase schliesst sie nur', () => {
@@ -153,8 +153,8 @@ describe('Hinweis', () => {
     expect(hintBtn().getAttribute('aria-pressed')).toBe('false');
     expect(screen.queryByText(BUBBLE)).toBeNull();
     expect(eraser()).not.toBeNull();
-    expect(loadState()?.rounds.de?.hints).toEqual([]);
-    expect(loadState()?.rounds.de?.guesses[0].marks).toEqual([1, 1, 2, 1, 1]);
+    expect(loadState()?.rounds.normal.de?.hints).toEqual([]);
+    expect(loadState()?.rounds.normal.de?.guesses[0].marks).toEqual([1, 1, 2, 1, 1]);
   });
 
   it('Tippen und Löschen überspringen den Hinweis, beim Prüfen zählt er mit und bleibt grün', async () => {
@@ -173,7 +173,7 @@ describe('Hinweis', () => {
     fireEvent.click(hintTile);
     expect(within(board()).getByRole('button', { name: 'O, Hinweis' })).toBeTruthy();
     expect(key('O').getAttribute('data-mark')).toBe('right');
-    expect(loadState()?.rounds.de?.guesses[0].hints).toEqual([1]);
+    expect(loadState()?.rounds.normal.de?.guesses[0].hints).toEqual([1]);
   });
 
   it('hebt die Schraffur des Hinweis-Buchstabens auf', () => {
@@ -185,7 +185,7 @@ describe('Hinweis', () => {
     expect(key('L').hasAttribute('data-hidden')).toBe(false);
     expect(key('L').getAttribute('data-mark')).toBe('right');
     expect(key('Q').hasAttribute('data-hidden')).toBe(true);
-    expect(loadState()?.rounds.de?.hidden).toEqual(['Q']);
+    expect(loadState()?.rounds.normal.de?.hidden).toEqual(['Q']);
   });
 
   it('ist nach Rundenende und bei fünf Hinweisen gesperrt', () => {
@@ -205,7 +205,7 @@ describe('Hinweis', () => {
     const { unmount } = renderWith(stateWith({ de: playedRound('WOLKE', []) }));
     fireEvent.click(hintBtn());
     fireEvent.click(hintBtn());
-    const saved = loadState()!.rounds.de!.hints;
+    const saved = loadState()!.rounds.normal.de!.hints;
     expect(saved).toHaveLength(1);
     unmount();
     render(<App />);
