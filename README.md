@@ -1,12 +1,12 @@
 # 500 Wörter
 
-Ein Wort-Ratespiel fürs iPhone nach dem Prinzip von [word500.com](https://word500.com), als installierbare Web-App (PWA) im Look von iOS-Widgets. Gesucht ist ein Wort mit 5 Buchstaben, auf Deutsch oder Englisch. Läuft komplett offline, ohne Konto und ohne Tracking.
+Ein Wort-Ratespiel fürs iPhone nach dem Prinzip von [word500.com](https://word500.com), als installierbare Web-App (PWA) im Look von iOS-Widgets. Gesucht ist ein Wort mit 5 Buchstaben, auf Deutsch oder Englisch. Wer es härter mag, spielt «500 Extreme»: weniger Versuche, keine Hinweise, im Neon-Look auf Schwarz. Läuft komplett offline, ohne Konto und ohne Tracking.
 
-![Die App: Spiel auf Deutsch mit Hinweis-Buchstabe K, Ausblenden aktiv, Englisch gewonnen](docs/app.png)
+![Die App: Normal-Modus mit Hinweis-Buchstabe K, «500 Extreme» im Black Mode, Extreme gewonnen](docs/app.png)
 
 ## So wird gespielt
 
-- Gesucht ist ein zufälliges Wort mit 5 Buchstaben. Du hast 8 Versuche.
+- Gesucht ist ein zufälliges Wort mit 5 Buchstaben. Du hast 8 Versuche, in «500 Extreme» 6.
 - Nach jedem Versuch stehen links nur drei Zahlen: **richtig** (✓, richtige Stelle), **im Wort** (⇄, andere Stelle) und **falsch** (✕, kommt nicht vor). Welche Buchstaben gemeint sind, verrät das Spiel nie von selbst.
 - Unten links löschst du einen Buchstaben (⌫), unten rechts prüfst du dein Wort (↵).
 - Tippe auf eine Kachel, um dir Notizen zu machen: ohne → Falsch → Im Wort → Richtig → ohne. Die Tastatur zeigt pro Buchstabe deine stärkste Markierung.
@@ -14,6 +14,15 @@ Ein Wort-Ratespiel fürs iPhone nach dem Prinzip von [word500.com](https://word5
 - Mit dem Schalter **Ausblenden** schraffierst du Buchstaben, die du ausschliessen willst (siehe unten).
 - Der **Hinweis «?»** gibt dir einen richtigen Buchstaben (siehe unten).
 - Der **Würfel** oben rechts zieht ein neues Wort. **DE | EN** wechselt die Sprache. Jede Sprache hat ihre eigene Runde.
+- Das kleine brennende Logo **«500 Extreme»** unter dem Titel schaltet in den Extreme-Modus (siehe unten).
+
+### 500 Extreme
+
+- **Umschalten:** Tippe auf das kleine Logo «500 Extreme» unter dem Titel. Dann steht oben gross das brennende «500 Extreme» und darunter klein «500 Wörter»; ein Tipp darauf bringt dich zurück.
+- **Regeln:** 6 Versuche statt 8 und keine Hinweise, der Button «?» fehlt. Markieren, Farben löschen, Ausblenden, Würfel und DE/EN funktionieren wie gewohnt.
+- **Runden:** Jeder Modus hat pro Sprache seine eigene laufende Runde, insgesamt also vier. Beim Umschalten geht nichts verloren. Die Lösungswörter kommen aus demselben Stapel, darum wiederholt sich auch über beide Modi kein Wort, bis alle 250 einer Sprache dran waren.
+- **Look:** schwarzer Hintergrund, Kacheln, Zahlen und Tasten nur mit leuchtenden Neon-Rändern: Grün für richtig, Gelb für im Wort, Rot für falsch. Die nächste Stelle und die Aktionen leuchten in Feuer-Orange. Gewonnen heisst hier «Höllisch gut!», verloren «Verbrannt».
+- Die App merkt sich den zuletzt gewählten Modus.
 
 ### Hinweis
 
@@ -90,16 +99,16 @@ Die App startet dann ohne Safari-Leisten wie eine normale App und funktioniert a
 ```
 src/
   game/          Spiellogik ohne Oberfläche: Wertung, Shuffle-Bag, Reducer, Speichern
-  components/    Kopfzeile, Spielfeld, Zeile, Kachel, Zahlen-Chips, Tastatur, Schalter,
-                 Ergebnis-Karte, Meldung, Dialog
-  styles/        tokens.css (Design-Tokens) und app.css
+  components/    Kopfzeile, Logo «500 Extreme», Spielfeld, Zeile, Kachel, Zahlen-Chips,
+                 Tastatur, Schalter, Ergebnis-Karte, Meldung, Dialog
+  styles/        tokens.css (Design-Tokens, Black Mode unter [data-mode="extreme"]) und app.css
   data/          Lösungswörter und Listen gültiger Rateversuche
 public/          erzeugte App-Icons und Favicon
 scripts/         Scripts für Wortlisten und Icons
 design/          App-Icon-Vorlagen, Referenzbilder, Quellen aus dem Design-Canvas, Inspiration
 ```
 
-Der Spielstand liegt in `localStorage` unter dem Schlüssel `500w:v1`.
+Der Spielstand liegt in `localStorage` unter dem Schlüssel `500w:v2`. Ältere Stände unter `500w:v1` übernimmt die App beim ersten Start in den Normal-Modus und entfernt danach den alten Schlüssel.
 
 ## Lizenz-Hinweise
 
