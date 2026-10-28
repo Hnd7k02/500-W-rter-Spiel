@@ -88,9 +88,10 @@ button:focus-visible {
 }
 
 /*
- * Wird der Platz knapp, schrumpfen zuerst die Kacheln (bis 30 px, siehe .board).
- * Erst wenn das Spielfeld selbst mit 30-px-Kacheln nicht mehr passt (325 px plus 9 px Luft oben),
- * sinken die Tasten bis auf 40 px. 504 px = Spielfeld 334 + Kopfzeile, Abstände und Tastatur ohne Tasten 170.
+ * Wird der Platz knapp, schrumpfen zuerst die Kacheln (bis 29 px, siehe .board).
+ * Erst wenn das Spielfeld selbst mit 29-px-Kacheln nicht mehr passt (317 px plus 9 px Luft oben),
+ * sinken die Tasten bis auf 40 px. 504 px = Spielfeld 326 + Kopfzeile 52, Abstände und Tastatur ohne Tasten 178.
+ * Die Kopfzeile wurde für das zweite Logo 8 px höher: Das tragen die Kacheln (1 px), die Tasten bleiben gleich.
  */
 @supports (height: 100dvh) {
   .app {
@@ -106,7 +107,7 @@ button:focus-visible {
 
 .header {
   flex: none;
-  height: 44px;
+  height: 52px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
@@ -118,6 +119,7 @@ button:focus-visible {
   padding: 2px;
   border-radius: 12px;
   background: var(--segment-track);
+  box-shadow: var(--segment-track-shadow);
 }
 
 .segment__btn {
@@ -140,26 +142,181 @@ button:focus-visible {
   box-shadow: var(--segment-on-shadow);
 }
 
-.title {
+/* Mitte: oben gross das Logo des Modus, darunter klein der Wechsel zum anderen Modus */
+.brand {
+  --brand-big: 20px;
+  --brand-small: 14px;
+  justify-self: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.brand__title {
   margin: 0;
-  font-size: 20px;
+  font-size: var(--brand-big);
   font-weight: 800;
+  line-height: 22px;
   letter-spacing: -0.02em;
   white-space: nowrap;
 }
 
-/* Schmale Geräte: Links und rechts stehen je 96 px Buttons, der Titel wird kleiner. */
+.brand__switch {
+  position: relative;
+  height: 20px;
+  padding: 0 6px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  font-size: var(--brand-small);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  color: var(--ink-soft);
+}
+
+/* Tippfläche 44 px hoch: nach oben über den grossen Titel, nach unten in den Abstand zum Spielfeld */
+.brand__switch::before {
+  content: '';
+  position: absolute;
+  top: -12px;
+  right: -2px;
+  bottom: -12px;
+  left: -2px;
+}
+
+.brand__switch:active {
+  filter: var(--key-pressed-filter);
+}
+
+/* Schmale Geräte: Links und rechts stehen je 96 px Buttons, die Logos werden kleiner. */
 @media (max-width: 359px) {
-  .title {
-    font-size: 16px;
+  .brand {
+    --brand-big: 16px;
+    --brand-small: 12.5px;
   }
 }
 
 @media (max-width: 339px) {
-  .title {
-    font-size: 15px;
+  .brand {
+    --brand-big: 15px;
+    --brand-small: 12px;
+  }
+
+  .brand__title {
     letter-spacing: -0.03em;
   }
+}
+
+/*
+ * «500 Extreme» im Höllen-Stil: Buchstaben glühen von Gelb über Orange zu Rot, darüber kleine
+ * Flammen. Die Flammen sitzen in einer unsichtbaren Kopie des Schriftzugs hinter den Buchstaben,
+ * je eine über jedem Buchstaben (--top: Höhe des Buchstabens in em). Der Glow liegt nur auf den
+ * ruhenden Buchstaben, damit die flackernden Flammen ihn nicht ständig neu zeichnen lassen.
+ */
+.fire {
+  position: relative;
+  display: inline-block;
+  line-height: 1;
+  isolation: isolate;
+  /* Beide Ebenen gleich setzen: Die Kopie mit den Flammen besteht aus einzelnen Buchstaben ohne Unterschneidung. */
+  font-kerning: none;
+}
+
+/* Hitze-Schimmer hinter dem Schriftzug (nur auf Schwarz) */
+.fire::before {
+  content: '';
+  position: absolute;
+  z-index: -2;
+  inset: -45% -8% 5%;
+  background: var(--fire-haze);
+  pointer-events: none;
+}
+
+.fire__text {
+  display: inline-block;
+  color: transparent;
+  background: var(--fire-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  filter: var(--fire-glow);
+}
+
+.fire__flames {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  color: transparent;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.fire__ch {
+  position: relative;
+  display: inline-block;
+}
+
+.fire__ch::before,
+.fire__ch::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  /* Grundlinie liegt etwa 0.11em über der Unterkante: Die Flamme wächst aus der Oberkante des Buchstabens. */
+  bottom: calc((var(--top) + 0.03) * 1em);
+  width: 0.44em;
+  height: calc(0.62em * var(--flame-size, 1));
+  margin-left: -0.22em;
+  background: var(--fire-flame-core), var(--fire-flame);
+  clip-path: polygon(50% 0%, 60% 16%, 73% 32%, 84% 50%, 90% 68%, 86% 84%, 72% 96%, 50% 100%, 28% 96%, 14% 84%, 10% 68%, 16% 50%, 27% 32%, 40% 16%);
+  transform-origin: 50% 100%;
+  animation: flame-flicker 1.2s ease-in-out infinite;
+}
+
+/* Zweite, kleinere Zunge seitlich daneben, im anderen Takt */
+.fire__ch::after {
+  width: 0.3em;
+  height: calc(0.36em * var(--flame-size, 1));
+  margin-left: 0.02em;
+  animation-duration: 0.9s;
+  animation-delay: -0.3s;
+}
+
+/* Flammen nicht im Gleichtakt: Höhe, Seite und Tempo wechseln von Buchstabe zu Buchstabe */
+.fire__ch:nth-child(3n + 2)::before {
+  height: calc(0.5em * var(--flame-size, 1));
+  animation-duration: 1.45s;
+  animation-delay: -0.4s;
+}
+
+.fire__ch:nth-child(3n + 2)::after {
+  height: calc(0.3em * var(--flame-size, 1));
+  margin-left: -0.28em;
+  animation-duration: 1.1s;
+  animation-delay: -0.65s;
+}
+
+.fire__ch:nth-child(3n)::before {
+  height: calc(0.72em * var(--flame-size, 1));
+  animation-duration: 0.95s;
+  animation-delay: -0.75s;
+}
+
+.fire__ch:nth-child(3n)::after {
+  height: calc(0.42em * var(--flame-size, 1));
+  animation-duration: 1.3s;
+  animation-delay: -0.15s;
+}
+
+.fire__ch:nth-child(4n + 1)::after {
+  margin-left: -0.24em;
+}
+
+/* Grosses Logo oben: Flammen im Verhältnis etwas kleiner, damit sie nicht an den Rand stossen */
+.brand__title .fire {
+  --flame-size: 0.78;
 }
 
 .header {
@@ -314,6 +471,8 @@ button:focus-visible {
 
 .board {
   --tile: 46px;
+  /* Anzahl Zeilen: 8 im Normal-Modus, 6 im Extreme-Modus (setzt das Spielfeld) */
+  --rows: 8;
   position: relative;
   margin: auto;
   display: flex;
@@ -323,8 +482,8 @@ button:focus-visible {
 
 @supports (container-type: size) {
   .board {
-    /* 85 px = Icon-Reihe 28 + 8 Zeilenabstände à 7 + 1 */
-    --tile: clamp(30px, min((100cqw - 124px) / 5, (100cqh - 85px) / 8), 50px);
+    /* Höhe ohne Kacheln: Icon-Reihe 28 + ein Zeilenabstand à 7 pro Zeile + 1 (bei 8 Zeilen 85 px) */
+    --tile: clamp(29px, min((100cqw - 124px) / 5, (100cqh - 29px - var(--rows) * 7px) / var(--rows)), 50px);
   }
 }
 
@@ -427,27 +586,32 @@ button:focus-visible {
   line-height: 1;
   font-variant-numeric: tabular-nums;
   background: var(--chip-empty-bg);
+  box-shadow: var(--chip-empty-shadow);
 }
 
 .chip--zero {
   color: var(--chip-zero-ink);
   background: var(--chip-zero-bg);
+  box-shadow: var(--chip-zero-shadow);
 }
 
 .chip--right {
   color: var(--right-ink);
+  text-shadow: var(--right-glow);
   background: var(--right-bg);
   box-shadow: var(--right-shadow-chip);
 }
 
 .chip--maybe {
   color: var(--maybe-ink);
+  text-shadow: var(--maybe-glow);
   background: var(--maybe-bg);
   box-shadow: var(--maybe-shadow-chip);
 }
 
 .chip--wrong {
   color: var(--wrong-ink);
+  text-shadow: var(--wrong-glow);
   background: var(--wrong-bg);
   box-shadow: var(--wrong-shadow-chip);
 }
@@ -516,6 +680,7 @@ button:focus-visible {
   font-weight: 800;
   line-height: 1;
   color: var(--ink);
+  text-shadow: var(--plain-glow);
   background: var(--tile-bg);
   box-shadow: var(--tile-shadow);
   transition:
@@ -556,10 +721,12 @@ button:focus-visible {
 
 .tile[data-mark='wrong'] {
   color: var(--wrong-ink);
+  text-shadow: var(--wrong-glow);
 }
 
 .tile[data-mark='maybe'] {
   color: var(--maybe-ink);
+  text-shadow: var(--maybe-glow);
 }
 
 .tile[data-mark='right'] {
@@ -650,6 +817,7 @@ button:focus-visible {
   font-weight: 700;
   line-height: 1;
   color: var(--ink);
+  text-shadow: var(--plain-glow);
   background: var(--key-bg);
   box-shadow: var(--key-shadow);
   transition:
@@ -692,19 +860,23 @@ button:focus-visible {
 
 .key[data-mark='wrong'] {
   color: var(--wrong-ink);
+  text-shadow: var(--wrong-glow);
 }
 
 .key[data-mark='maybe'] {
   color: var(--maybe-ink);
+  text-shadow: var(--maybe-glow);
 }
 
 .key[data-mark='right'] {
   color: var(--right-ink);
+  text-shadow: var(--right-glow);
 }
 
 /* Die Schraffur überdeckt die Markierungsfarbe. */
 .key[data-hidden] {
   color: var(--key-hidden-ink);
+  text-shadow: none;
 }
 
 .key[data-hidden] > .fill:not(.fill--hidden) {
@@ -716,9 +888,14 @@ button:focus-visible {
 }
 
 .key--action {
-  color: #FFFFFF;
+  color: var(--action-ink);
   background: var(--action-bg);
   box-shadow: var(--action-shadow);
+}
+
+.key--action svg,
+.result__btn svg {
+  filter: var(--action-icon-glow);
 }
 
 .key--delete {
@@ -863,7 +1040,7 @@ button:focus-visible {
   border-radius: 50%;
   display: grid;
   place-items: center;
-  color: #FFFFFF;
+  color: var(--result-icon-ink);
   background: var(--right-bg);
   box-shadow: var(--result-icon-shadow);
 }
@@ -910,7 +1087,8 @@ button:focus-visible {
   font-size: 15px;
   font-weight: 800;
   white-space: nowrap;
-  color: #FFFFFF;
+  color: var(--action-ink);
+  text-shadow: var(--action-glow);
   background: var(--action-bg);
   box-shadow: var(--action-shadow);
 }
@@ -967,6 +1145,18 @@ button:focus-visible {
     padding: 0 13px 0 11px;
     gap: 6px;
     font-size: 14px;
+  }
+}
+
+/* Sehr schmal (320 px): Der Untertitel bricht um. Die Karte bleibt trotzdem niedriger als zwei freie Zeilen. */
+@container (max-width: 319px) {
+  .result--board {
+    padding-block: 7px;
+  }
+
+  .result--board .result__sub {
+    font-size: 12px;
+    line-height: 1.15;
   }
 }
 
@@ -1028,8 +1218,9 @@ button:focus-visible {
   align-items: center;
   gap: 10px;
   width: 100%;
-  min-height: 44px;
-  padding: 7px 18px 7px 7px;
+  /* So hoch wie die Kopfzeile, damit sie diese ganz abdeckt */
+  min-height: 52px;
+  padding: 7px 18px 7px 11px;
   /* Verdeckte Buttons der Kopfzeile sollen nicht unsichtbar mitreagieren. */
   pointer-events: auto;
   border-radius: var(--r-toast);
@@ -1043,7 +1234,7 @@ button:focus-visible {
 }
 
 .toast:has(.toast__action) {
-  padding-right: 7px;
+  padding-right: 11px;
 }
 
 .toast__text {
@@ -1277,6 +1468,32 @@ button:focus-visible {
   }
 }
 
+@keyframes flame-flicker {
+  0%,
+  100% {
+    transform: scale(1, 1) skewX(0deg);
+    opacity: 0.95;
+  }
+  22% {
+    transform: scale(0.88, 1.16) skewX(-7deg);
+    opacity: 1;
+  }
+  46% {
+    transform: scale(1.06, 0.86) skewX(4deg);
+    opacity: 0.82;
+  }
+  72% {
+    transform: scale(0.93, 1.1) skewX(-3deg);
+    opacity: 1;
+  }
+}
+
+/* Wechsel Normal ⇄ «500 Extreme»: kurze Überblendung der ganzen Seite */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 250ms;
+}
+
 @keyframes dialog-in {
   from {
     opacity: 0;
@@ -1317,5 +1534,11 @@ button:focus-visible {
 
   .key:active {
     transform: none;
+  }
+
+  /* Flammen stehen still */
+  .fire__ch::before,
+  .fire__ch::after {
+    animation: none;
   }
 }

@@ -137,7 +137,181 @@
   --toast-action-bg: rgba(10, 132, 255, 0.10);
   --toast-action-ink: #0A6FE0;
 
+  /* Leuchten und Ränder, die nur der Extreme-Modus braucht: im Normal-Modus neutral */
+  --right-glow: none;
+  --maybe-glow: none;
+  --wrong-glow: none;
+  --plain-glow: none;
+  --chip-zero-shadow: none;
+  --chip-empty-shadow: none;
+  --segment-track-shadow: none;
+  --action-ink: #FFFFFF;
+  --action-glow: none;
+  --action-icon-glow: none;
+  --result-icon-ink: #FFFFFF;
+
+  /*
+   * Logo «500 Extreme»: glühend von Gelb über Orange zu Rot. Auf hellem Grund etwas satter und mit
+   * schwächerem Glow, damit der kleine Schriftzug lesbar bleibt; auf Schwarz heller (siehe unten).
+   */
+  --fire-text: linear-gradient(180deg, #FFC21A 16%, #FF8A1C 40%, #F2420F 66%, #C8140A 92%);
+  --fire-flame: linear-gradient(0deg, #FFD23C 0%, #FF9A1F 30%, #FF5A14 60%, rgba(232, 32, 14, 0.6) 86%, rgba(232, 32, 14, 0.1) 100%);
+  --fire-flame-core: radial-gradient(42% 34% at 50% 84%, rgba(255, 250, 215, 0.95), rgba(255, 250, 215, 0) 100%);
+  --fire-glow: drop-shadow(0 0 1px rgba(255, 90, 20, 0.55)) drop-shadow(0 0 3px rgba(255, 106, 26, 0.4));
+  --fire-haze: none;
+
   /* Bewegung */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/*
+ * «500 Extreme»: Black Mode. Hängt an <html data-mode="extreme"> und überschreibt nur Tokens.
+ * Keine gefüllten Flächen: Kacheln, Chips und Tasten sind dunkel mit 2 px Neon-Rand, Buchstaben
+ * und Zahlen leuchten in derselben Farbe. Aktionen und die nächste Stelle sind Feuer-Orange.
+ */
+:root[data-mode='extreme'] {
+  color-scheme: dark;
+
+  /* Logo auf Schwarz: heller, mit kräftigem Glow und Hitze-Schimmer */
+  --fire-text: linear-gradient(180deg, #FFE45C 14%, #FFB224 38%, #FF6A1A 62%, #E8200E 90%);
+  --fire-glow: drop-shadow(0 0 1px rgba(255, 90, 20, 0.9)) drop-shadow(0 0 6px rgba(255, 106, 26, 0.6)) drop-shadow(0 0 14px rgba(255, 60, 20, 0.3));
+  --fire-haze: radial-gradient(50% 62% at 50% 72%, rgba(255, 80, 20, 0.26), rgba(255, 80, 20, 0) 75%);
+
+  /* Neon */
+  --neon-right: #39FF88;
+  --neon-right-rgb: 57, 255, 136;
+  --neon-maybe: #FFD23C;
+  --neon-maybe-rgb: 255, 210, 60;
+  --neon-wrong: #FF3D5A;
+  --neon-wrong-rgb: 255, 61, 90;
+  --neon-fire: #FF6A1A;
+  --neon-fire-rgb: 255, 106, 26;
+  --neon-fire-soft: #FF8A4C;
+  /* ohne Markierung und getippt */
+  --neon-line: rgba(255, 255, 255, 0.35);
+  /* leere Plätze */
+  --neon-line-empty: rgba(255, 255, 255, 0.08);
+  --neon-width: 2px;
+
+  /* Schwarz: Seite, Karten und Buttons mit feiner heller Umrandung */
+  --black: #050507;
+  --black-card: #0E0E12;
+  --black-edge: rgba(255, 255, 255, 0.1);
+  --black-edge-strong: rgba(255, 255, 255, 0.16);
+
+  /* Flächen und Text */
+  --bg: var(--black);
+  --bg-glow: radial-gradient(120% 46% at 50% -10%, rgba(255, 48, 16, 0.24) 0%, rgba(255, 48, 16, 0.07) 46%, rgba(255, 48, 16, 0) 72%);
+  --card: var(--black-card);
+  --card-shadow: inset 0 0 0 1px var(--black-edge);
+  --toast-shadow: inset 0 0 0 1px var(--black-edge-strong), 0 24px 48px -16px rgba(0, 0, 0, 0.9);
+  --ink: #F5F5F7;
+  --ink-soft: rgba(235, 235, 245, 0.62);
+  --ink-mute: rgba(235, 235, 245, 0.45);
+
+  /* Markierungen */
+  --right-bg: var(--black-card);
+  --right-ink: var(--neon-right);
+  --right-glow: 0 0 6px rgba(var(--neon-right-rgb), 0.8), 0 0 14px rgba(var(--neon-right-rgb), 0.35);
+  --right-text-shadow: var(--right-glow);
+  --right-shadow: inset 0 0 0 var(--neon-width) var(--neon-right), inset 0 0 12px -5px rgba(var(--neon-right-rgb), 0.7), 0 0 14px -5px rgba(var(--neon-right-rgb), 0.8);
+  --right-shadow-key: inset 0 0 0 var(--neon-width) var(--neon-right), 0 0 10px -4px rgba(var(--neon-right-rgb), 0.8);
+  --right-shadow-chip: inset 0 0 0 var(--neon-width) var(--neon-right), 0 0 9px -3px rgba(var(--neon-right-rgb), 0.75);
+  --maybe-bg: var(--black-card);
+  --maybe-ink: var(--neon-maybe);
+  --maybe-glow: 0 0 6px rgba(var(--neon-maybe-rgb), 0.75), 0 0 14px rgba(var(--neon-maybe-rgb), 0.3);
+  --maybe-shadow: inset 0 0 0 var(--neon-width) var(--neon-maybe), inset 0 0 12px -5px rgba(var(--neon-maybe-rgb), 0.65), 0 0 14px -5px rgba(var(--neon-maybe-rgb), 0.75);
+  --maybe-shadow-key: inset 0 0 0 var(--neon-width) var(--neon-maybe), 0 0 10px -4px rgba(var(--neon-maybe-rgb), 0.75);
+  --maybe-shadow-chip: inset 0 0 0 var(--neon-width) var(--neon-maybe), 0 0 9px -3px rgba(var(--neon-maybe-rgb), 0.7);
+  --wrong-bg: var(--black-card);
+  --wrong-ink: var(--neon-wrong);
+  --wrong-glow: 0 0 6px rgba(var(--neon-wrong-rgb), 0.8), 0 0 14px rgba(var(--neon-wrong-rgb), 0.35);
+  --wrong-shadow: inset 0 0 0 var(--neon-width) var(--neon-wrong), inset 0 0 12px -5px rgba(var(--neon-wrong-rgb), 0.7), 0 0 14px -5px rgba(var(--neon-wrong-rgb), 0.8);
+  --wrong-shadow-key: inset 0 0 0 var(--neon-width) var(--neon-wrong), 0 0 10px -4px rgba(var(--neon-wrong-rgb), 0.8);
+  --wrong-shadow-chip: inset 0 0 0 var(--neon-width) var(--neon-wrong), 0 0 9px -3px rgba(var(--neon-wrong-rgb), 0.75);
+
+  /* Kacheln und Eingabezeile */
+  --tile-bg: var(--black-card);
+  --tile-shadow: inset 0 0 0 var(--neon-width) var(--neon-line);
+  --plain-glow: 0 0 6px rgba(255, 255, 255, 0.22);
+  --slot-bg: transparent;
+  --slot-shadow: inset 0 0 0 var(--neon-width) var(--neon-line-empty);
+  --input-rest-bg: transparent;
+  --input-rest-shadow: inset 0 0 0 var(--neon-width) var(--neon-line-empty);
+  --cursor-bg: var(--black-card);
+  --focus-ring: inset 0 0 0 var(--neon-width) var(--neon-fire), inset 0 0 12px -4px rgba(var(--neon-fire-rgb), 0.75), 0 0 16px -3px rgba(var(--neon-fire-rgb), 0.85);
+  --focus-outline: var(--neon-fire);
+
+  /* Zahlen-Chips */
+  --chip-zero-bg: transparent;
+  --chip-zero-ink: rgba(255, 255, 255, 0.5);
+  --chip-zero-shadow: inset 0 0 0 var(--neon-width) rgba(255, 255, 255, 0.2);
+  --chip-empty-bg: transparent;
+  --chip-empty-shadow: inset 0 0 0 var(--neon-width) var(--neon-line-empty);
+
+  /* Tastatur */
+  --key-bg: var(--black-card);
+  --key-shadow: inset 0 0 0 var(--neon-width) var(--neon-line);
+  --key-special-bg: var(--black-card);
+  --key-special-shadow: inset 0 0 0 var(--neon-width) var(--neon-line);
+  --key-hidden-bg: repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.14) 0 2px, rgba(255, 255, 255, 0) 2px 6px);
+  --key-hidden-ink: rgba(255, 255, 255, 0.3);
+  --key-hidden-shadow: inset 0 0 0 var(--neon-width) rgba(255, 255, 255, 0.12);
+  --key-pressed-filter: brightness(1.45);
+  --action-bg: var(--black-card);
+  --action-ink: var(--neon-fire);
+  --action-glow: 0 0 6px rgba(var(--neon-fire-rgb), 0.85), 0 0 14px rgba(var(--neon-fire-rgb), 0.4);
+  --action-icon-glow: drop-shadow(0 0 4px rgba(var(--neon-fire-rgb), 0.85));
+  --action-shadow: inset 0 0 0 var(--neon-width) var(--neon-fire), inset 0 0 12px -5px rgba(var(--neon-fire-rgb), 0.7), 0 0 16px -5px rgba(var(--neon-fire-rgb), 0.9);
+  --hide-glow: 0 0 0 2px rgba(var(--neon-fire-rgb), 0.85), 0 0 28px 2px rgba(var(--neon-fire-rgb), 0.3);
+  --hide-hint-ink: var(--neon-fire-soft);
+  --hide-icon-bg: repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.24) 0 2px, rgba(255, 255, 255, 0) 2px 5px);
+  --hide-icon-bg-on: repeating-linear-gradient(135deg, rgba(var(--neon-fire-rgb), 0.95) 0 2px, rgba(var(--neon-fire-rgb), 0.12) 2px 5px);
+  --hide-icon-shadow: inset 0 0 0 1px var(--black-edge-strong);
+  --switch-off: #17171D;
+  --switch-off-shadow: inset 0 0 0 1.5px var(--black-edge-strong);
+  --switch-on-glow: inset 0 0 0 var(--neon-width) var(--neon-fire), 0 0 14px -2px rgba(var(--neon-fire-rgb), 0.85);
+  --switch-knob: #F5F5F7;
+  --switch-knob-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+
+  /* Kopfzeile */
+  --segment-track: var(--black-card);
+  --segment-track-shadow: inset 0 0 0 1px var(--black-edge);
+  --segment-off-ink: rgba(235, 235, 245, 0.55);
+  --segment-on-bg: #1D1D24;
+  --segment-on-shadow: inset 0 0 0 1px var(--black-edge-strong);
+  --dice-bg: var(--black-card);
+  --dice-shadow: inset 0 0 0 1px var(--black-edge);
+  --dice-glow: inset 0 0 0 var(--neon-width) var(--neon-fire), 0 0 18px -2px rgba(var(--neon-fire-rgb), 0.75);
+
+  /* Icons über den Zahlen-Spalten */
+  --icon-right: var(--neon-right);
+  --icon-maybe: var(--neon-maybe);
+  --icon-wrong: var(--neon-wrong);
+
+  /* Ergebnis-Karte */
+  --result-icon-ink: var(--neon-right);
+  --result-icon-shadow: var(--right-shadow-chip);
+  --lost-bg: var(--black-card);
+  --lost-ink: var(--neon-wrong);
+  --lost-shadow: var(--wrong-shadow-chip);
+
+  /* Meldungen */
+  --toast-info-bg: rgba(255, 255, 255, 0.08);
+  --toast-info-ink: rgba(235, 235, 245, 0.72);
+  --toast-action-bg: rgba(var(--neon-fire-rgb), 0.14);
+  --toast-action-ink: var(--neon-fire-soft);
+
+  /* Dialog */
+  --dialog-bg: rgba(22, 22, 28, 0.96);
+  --dialog-backdrop: rgba(0, 0, 0, 0.62);
+  --dialog-separator: rgba(255, 255, 255, 0.12);
+  --dialog-ink: var(--neon-fire-soft);
+  --dialog-pressed: rgba(255, 255, 255, 0.08);
+
+  /* Radierer */
+  --eraser-bg: var(--black-card);
+  --eraser-ink: rgba(235, 235, 245, 0.72);
+  --eraser-shadow: inset 0 0 0 1px var(--black-edge-strong);
 }
