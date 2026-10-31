@@ -794,6 +794,16 @@ button:focus-visible {
   opacity: 1;
 }
 
+/* Tastenfläche: reicht über das Kartenpolster, damit dort kein toter Rand bleibt. */
+.kb-keys {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 -8px -10px;
+  padding: 0 8px 10px;
+  touch-action: none;
+}
+
 .kb-row {
   display: flex;
   gap: 6px;
@@ -826,7 +836,7 @@ button:focus-visible {
     transform 90ms ease;
 }
 
-.key:active {
+.key[data-pressed] {
   transform: scale(0.94);
 }
 
@@ -835,7 +845,7 @@ button:focus-visible {
   cursor: default;
 }
 
-.key[aria-disabled='true']:active {
+.key[aria-disabled='true'][data-pressed] {
   transform: none;
 }
 

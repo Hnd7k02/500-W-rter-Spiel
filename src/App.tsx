@@ -316,6 +316,7 @@ export function App() {
         />
         <Keyboard
           round={round}
+          lang={state.lang}
           resultDelayed={celebrate}
           onLetter={(letter) => dispatch({ type: 'tapKey', letter })}
           onEnter={() => void submit()}
