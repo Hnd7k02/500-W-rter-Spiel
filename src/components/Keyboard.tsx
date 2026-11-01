@@ -5,7 +5,6 @@ import {
   useState,
   type PointerEvent as ReactPointerEvent,
 } from "react";
-import { createPortal } from "react-dom";
 import { fitsWord, resolveKey, type KeyRect } from "../game/keyHit";
 import {
   currentSlots,
@@ -38,26 +37,6 @@ interface Touch {
   pointerType: string;
   keys: MeasuredKey[];
   key: MeasuredKey | null;
-}
-
-interface Bubble {
-  letter: string;
-  left: number;
-  top: number;
-  width: number;
-  height: number;
-}
-
-function bubbleFor(key: MeasuredKey): Bubble {
-  const width = (key.right - key.left) * 1.5;
-  const height = (key.bottom - key.top) * 1.25;
-  const vw = window.innerWidth;
-  const left = Math.min(
-    Math.max((key.left + key.right - width) / 2, 4),
-    vw - width - 4,
-  );
-  const top = Math.max(key.top - height - 8, 4);
-  return { letter: key.id, left, top, width, height };
 }
 
 interface KeyboardProps {
@@ -121,7 +100,6 @@ export function Keyboard({
   const touch = useRef<Touch | null>(null);
   const lastFire = useRef(0);
   const [pressed, setPressed] = useState<string | null>(null);
-  const [bubble, setBubble] = useState<Bubble | null>(null);
 
   const fire = (id: string) => {
     if (id === "DEL") onDelete();
@@ -134,22 +112,11 @@ export function Keyboard({
     fire(id);
   };
 
-  const show = (t: Touch) => {
-    const key = t.key;
-    setPressed(key?.id ?? null);
-    const preview =
-      key &&
-      t.pointerType !== "mouse" &&
-      key.id.length === 1 &&
-      key.el.getAttribute("aria-disabled") !== "true" &&
-      key.right > key.left;
-    setBubble(preview ? bubbleFor(key) : null);
-  };
+  const show = (t: Touch) => setPressed(t.key?.id ?? null);
 
   const end = () => {
     touch.current = null;
     setPressed(null);
-    setBubble(null);
   };
 
   const locate = (t: Touch, e: ReactPointerEvent) => {
@@ -321,34 +288,6 @@ export function Keyboard({
           </button>
         </div>
       </div>
-      {bubble &&
-        createPortal(
-          <div
-            aria-hidden="true"
-            style={{
-              position: "fixed",
-              left: bubble.left,
-              top: bubble.top,
-              width: bubble.width,
-              height: bubble.height,
-              display: "grid",
-              placeItems: "center",
-              borderRadius: "var(--r-key)",
-              background: "var(--card)",
-              boxShadow: "var(--card-shadow), var(--key-shadow)",
-              color: "var(--ink)",
-              textShadow: "var(--plain-glow)",
-              fontSize: 30,
-              fontWeight: 700,
-              lineHeight: 1,
-              pointerEvents: "none",
-              zIndex: 1000,
-            }}
-          >
-            {bubble.letter}
-          </div>,
-          document.body,
-        )}
     </section>
   );
 }
