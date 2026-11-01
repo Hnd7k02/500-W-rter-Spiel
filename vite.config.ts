@@ -21,6 +21,7 @@ export default defineConfig({
         description: 'Wort-Ratespiel mit fünf Buchstaben auf Deutsch und Englisch.',
         lang: 'de',
         display: 'standalone',
+        orientation: 'portrait',
         theme_color: '#F1F2F6',
         background_color: '#F1F2F6',
         icons: [

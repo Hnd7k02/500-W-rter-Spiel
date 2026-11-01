@@ -1552,3 +1552,37 @@ button:focus-visible {
     animation: none;
   }
 }
+
+/* Querformat auf Handys: iOS lässt die Drehung nicht sperren, darum ein Hinweis. Die App bleibt geladen. */
+.rotate-hint {
+  display: none;
+}
+
+@media (orientation: landscape) and (max-height: 500px) and (pointer: coarse) {
+  .rotate-hint {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: var(--bg-glow) no-repeat, var(--bg);
+    color: var(--ink);
+    font-size: 17px;
+    font-weight: 700;
+  }
+
+  .rotate-hint p {
+    margin: 0;
+  }
+
+  .rotate-hint svg {
+    color: var(--ink-soft);
+  }
+
+  .app {
+    visibility: hidden;
+  }
+}
