@@ -22,6 +22,8 @@ export type Action =
   /** Schreibt eine bereits geprüfte Eingabe fest, nur in der Runde, in der sie getippt wurde. */
   | { type: 'commit'; mode: Mode; lang: Lang; word: string }
   | { type: 'mark'; row: number; col: number }
+  /** Langes Drücken: Farbe einer Kachel entfernen */
+  | { type: 'clearMark'; row: number; col: number }
   | { type: 'toggleHideMode' }
   | { type: 'newRound'; seed: number }
   | { type: 'setLang'; lang: Lang; seed: number }
@@ -295,6 +297,17 @@ export function cycleMark(round: Round, row: number, col: number): Round {
   return { ...round, guesses };
 }
 
+/** Langes Drücken: Markierung einer Kachel entfernen. Gewinnzeile und Hinweise bleiben grün. */
+export function clearMark(round: Round, row: number, col: number): Round {
+  const guess = round.guesses[row];
+  if (!guess || col < 0 || col >= WORD_LENGTH || isWinningRow(round, row) || guess.hints.includes(col)) return round;
+  if (guess.marks[col] === 0) return round;
+  const marks = [...guess.marks];
+  marks[col] = 0;
+  const guesses = round.guesses.map((g, i) => (i === row ? { ...g, marks } : g));
+  return { ...round, guesses };
+}
+
 function updateRound(state: GameState, mode: Mode, lang: Lang, update: (round: Round) => Round): GameState {
   const round = state.rounds[mode][lang];
   if (!round) return state;
@@ -329,6 +342,8 @@ export function reducer(state: GameState, action: Action): GameState {
       return updateActive(state, deleteLetter);
     case 'mark':
       return updateActive(state, (r) => cycleMark(r, action.row, action.col));
+    case 'clearMark':
+      return updateActive(state, (r) => clearMark(r, action.row, action.col));
     case 'toggleHideMode':
       return updateActive(state, toggleHideMode);
     case 'hint':

@@ -26,6 +26,7 @@ interface RowProps {
   pop: boolean;
   celebrate: boolean;
   onMark: (col: number) => void;
+  onClear: (col: number) => void;
 }
 
 const COLS = Array.from({ length: WORD_LENGTH }, (_, i) => i);
@@ -75,7 +76,7 @@ function useFreshHints(current?: CurrentRow): number[] {
   return hints.filter((col) => !before.has(col));
 }
 
-export function Row({ index, guess, current, tilesRef, gone, win, pop, celebrate, onMark }: RowProps) {
+export function Row({ index, guess, current, tilesRef, gone, win, pop, celebrate, onMark, onClear }: RowProps) {
   const newLetter = useNewLetter(current?.input);
   const freshHints = useFreshHints(current);
 
@@ -94,6 +95,7 @@ export function Row({ index, guess, current, tilesRef, gone, win, pop, celebrate
             hint={hint}
             celebrate={celebrate}
             onMark={() => onMark(col)}
+            onClear={() => onClear(col)}
           />
         );
       });

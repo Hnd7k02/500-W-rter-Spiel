@@ -14,6 +14,7 @@ interface BoardProps {
   /** Zählt bei jedem Fehler hoch: Die Eingabezeile wackelt. */
   shakeSignal: number;
   onMark: (row: number, col: number) => void;
+  onClear: (row: number, col: number) => void;
   /** Radierer: alle eigenen Markierungen entfernen */
   onClearMarks: () => void;
   /** Die Sprechblase des Hinweises liegt über der Symbolzeile: Radierer so lange ausblenden */
@@ -43,6 +44,7 @@ export function Board({
   celebrate,
   shakeSignal,
   onMark,
+  onClear,
   onClearMarks,
   toolsCovered,
   onNewWord,
@@ -112,6 +114,7 @@ export function Board({
               pop={popRow === i}
               celebrate={celebrate && win}
               onMark={(col) => onMark(i, col)}
+              onClear={(col) => onClear(i, col)}
             />
           );
         })}

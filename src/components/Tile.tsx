@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react';
+import { useEffect, useRef, type CSSProperties, type PointerEvent } from 'react';
 import type { Mark } from '../game/types';
 import { MARK_LABELS, markName } from './marks';
 
@@ -19,7 +19,14 @@ type TileProps =
       hint: boolean;
       celebrate: boolean;
       onMark: () => void;
+      /** Langes Drücken: Farbe entfernen */
+      onClear: () => void;
     };
+
+/** So lange drücken, bis die Farbe weggeht */
+const LONG_PRESS_MS = 450;
+/** Mehr Bewegung bricht das lange Drücken ab. */
+const MOVE_PX = 10;
 
 export function Tile(props: TileProps) {
   if (props.kind === 'hint') {
@@ -40,7 +47,58 @@ export function Tile(props: TileProps) {
     );
   }
 
-  const { letter, mark, col, locked, hint, celebrate, onMark } = props;
+  return <GuessTile {...props} />;
+}
+
+function GuessTile({ letter, mark, col, locked, hint, celebrate, onMark, onClear }: Extract<TileProps, { kind: 'guess' }>) {
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const start = useRef({ x: 0, y: 0 });
+  /** Nach langem Drücken den folgenden click ignorieren. */
+  const skipClick = useRef(false);
+  const onClearRef = useRef(onClear);
+  onClearRef.current = onClear;
+
+  const cancel = () => {
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = null;
+  };
+  useEffect(() => cancel, []);
+
+  const onPointerDown = (e: PointerEvent) => {
+    skipClick.current = false;
+    cancel();
+    start.current = { x: e.clientX, y: e.clientY };
+    timer.current = setTimeout(() => {
+      timer.current = null;
+      skipClick.current = true;
+      onClearRef.current();
+    }, LONG_PRESS_MS);
+  };
+
+  const onPointerMove = (e: PointerEvent) => {
+    if (timer.current && Math.hypot(e.clientX - start.current.x, e.clientY - start.current.y) > MOVE_PX) cancel();
+  };
+
+  const onClick = () => {
+    if (skipClick.current) {
+      skipClick.current = false;
+      return;
+    }
+    onMark();
+  };
+
+  const press = locked
+    ? {}
+    : {
+        onPointerDown,
+        onPointerMove,
+        onPointerUp: cancel,
+        onPointerCancel: cancel,
+        onPointerLeave: cancel,
+        onContextMenu: (e: { preventDefault: () => void }) => e.preventDefault(),
+        onClick,
+      };
+
   const className = ['tile', locked && 'tile--win', hint && 'tile--hint', celebrate && 'tile--celebrate']
     .filter(Boolean)
     .join(' ');
@@ -52,7 +110,7 @@ export function Tile(props: TileProps) {
       style={{ '--i': col } as CSSProperties}
       aria-label={hint ? `${letter}, Hinweis` : `${letter}, ${MARK_LABELS[mark]}`}
       aria-disabled={locked || undefined}
-      onClick={locked ? undefined : onMark}
+      {...press}
     >
       <span className="fill fill--wrong" />
       <span className="fill fill--maybe" />

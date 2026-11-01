@@ -384,6 +384,7 @@ export function App() {
           celebrate={celebrate}
           shakeSignal={shakeSignal}
           onMark={(row, col) => dispatch({ type: "mark", row, col })}
+          onClear={(row, col) => dispatch({ type: "clearMark", row, col })}
           onClearMarks={onClearMarks}
           toolsCovered={hintArmed}
           onNewWord={startNewWord}

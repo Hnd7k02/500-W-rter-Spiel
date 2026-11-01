@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
-import { beforeAll, describe, expect, it } from 'vitest';
+import { act } from 'react';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { App } from './App';
 import { loadState, saveState } from './game/storage';
 import type { GameState } from './game/types';
@@ -85,6 +86,30 @@ describe('Markieren', () => {
     expect(key('S').getAttribute('data-mark')).toBeNull();
     // Die Wertung bleibt
     expect(rowText('Versuch 1: 0 richtig, 1 im Wort, 4 falsch')).toBeTruthy();
+  });
+
+  it('langes Drücken entfernt die Farbe, kurzes Antippen schaltet weiter', () => {
+    renderWith(stateWith({ de: playedRound('WOLKE', ['STERN']) }));
+    const tile = within(board()).getByRole('button', { name: 'S, ohne Markierung' });
+    fireEvent.click(tile);
+    fireEvent.click(tile);
+    expect(tile.getAttribute('aria-label')).toBe('S, im Wort');
+    vi.useFakeTimers();
+    try {
+      fireEvent.pointerDown(tile);
+      act(() => {
+        vi.advanceTimersByTime(500);
+      });
+      fireEvent.pointerUp(tile);
+      fireEvent.click(tile);
+    } finally {
+      vi.useRealTimers();
+    }
+    expect(tile.getAttribute('aria-label')).toBe('S, ohne Markierung');
+    fireEvent.pointerDown(tile);
+    fireEvent.pointerUp(tile);
+    fireEvent.click(tile);
+    expect(tile.getAttribute('aria-label')).toBe('S, falsch');
   });
 
   it('die Gewinnzeile ist grün und lässt sich nicht umfärben', () => {
